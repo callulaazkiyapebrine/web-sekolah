@@ -2,82 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProfileSekolah;
 use Illuminate\Http\Request;
+use App\Models\ProfileSekolah;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileSekolahController extends Controller
 {
-    // TAMPIL PROFILE SEKOLAH
     public function index()
     {
-        $profilSekolah = ProfileSekolah::firstOrCreate([], [
-            'nama_sekolah'   => 'SMK YPC TASIKMALAYA',
-            'npsn'           => '-',
-            'kepala_sekolah' => '-',
-            'tahun_berdiri'  => 2000,
-            'kontak'         => '-',
-            'alamat'         => '-',
-            'deskripsi'      => '-',
-            'visi_misi'      => '-',
-            'logo'           => null,
-            'foto'           => null,
-        ]);
-
-        // Mengarahkan ke admin/profile-sekolah/index.blade.php (pakai huruf 'e')
-        return view('admin.profile-sekolah.index', [
-            'title'         => 'Profile Sekolah',
-            'profilSekolah' => $profilSekolah
-        ]);
+        $profil = ProfileSekolah::first();
+        return view('admin.profile-sekolah.index', compact('profil'));
     }
 
-    // SIMPAN / UPDATE PROFILE SEKOLAH
     public function save(Request $request)
     {
+        // 1. Validasi Input
         $request->validate([
-            'nama_sekolah'   => 'required|string|max:40',
-            'kepala_sekolah' => 'required|string|max:40',
-            'npsn'           => 'required|string|max:10',
-            'tahun_berdiri'  => 'required|numeric',
-            'kontak'         => 'required|string|max:15',
-            'alamat'         => 'required|string',
-            'visi_misi'      => 'required|string',
-            'deskripsi'      => 'nullable|string',
-            'logo'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'nama_sekolah'        => 'required|string|max:255',
+            'nama_kepala_sekolah' => 'required|string|max:255',
+            'npsn'                => 'required|string|max:50',
+            'tahun_berdiri'       => 'required|numeric',
+            'no_telepon'          => 'required|string|max:20',
+            'alamat'              => 'required|string',
+            'visi_misi'           => 'required|string',
+            'deskripsi'           => 'nullable|string',
+            'logo'                => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_gedung'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $profilSekolah = ProfileSekolah::first() ?? new ProfileSekolah();
+        // 2. Ambil data pertama atau buat instance baru jika belum ada
+        $profil = ProfileSekolah::first() ?? new ProfileSekolah();
 
-        $profilSekolah->nama_sekolah   = $request->nama_sekolah;
-        $profilSekolah->kepala_sekolah = $request->kepala_sekolah;
-        $profilSekolah->npsn           = $request->npsn;
-        $profilSekolah->tahun_berdiri  = $request->tahun_berdiri;
-        $profilSekolah->kontak         = $request->kontak;
-        $profilSekolah->alamat         = $request->alamat;
-        $profilSekolah->visi_misi      = $request->visi_misi;
-        $profilSekolah->deskripsi      = $request->deskripsi;
+        // 3. Set Data Text
+        $profil->nama_sekolah        = $request->nama_sekolah;
+        $profil->nama_kepala_sekolah = $request->nama_kepala_sekolah;
+        $profil->npsn                = $request->npsn;
+        $profil->tahun_berdiri       = $request->tahun_berdiri;
+        $profil->no_telepon          = $request->no_telepon;
+        $profil->alamat              = $request->alamat;
+        $profil->visi_misi           = $request->visi_misi;
+        $profil->deskripsi           = $request->deskripsi;
 
-        // Upload Logo
+        // 4. Handle Upload Logo
         if ($request->hasFile('logo')) {
-            if ($profilSekolah->logo && Storage::disk('public')->exists($profilSekolah->logo)) {
-                Storage::disk('public')->delete($profilSekolah->logo);
+            if ($profil->logo && Storage::disk('public')->exists($profil->logo)) {
+                Storage::disk('public')->delete($profil->logo);
             }
-            $profilSekolah->logo = $request->file('logo')->store('profile', 'public');
+            $profil->logo = $request->file('logo')->store('profil', 'public');
         }
 
-        // Upload Foto Gedung
-        if ($request->hasFile('foto')) {
-            if ($profilSekolah->foto && Storage::disk('public')->exists($profilSekolah->foto)) {
-                Storage::disk('public')->delete($profilSekolah->foto);
+        // 5. Handle Upload Foto Gedung
+        if ($request->hasFile('foto_gedung')) {
+            if ($profil->foto_gedung && Storage::disk('public')->exists($profil->foto_gedung)) {
+                Storage::disk('public')->delete($profil->foto_gedung);
             }
-            $profilSekolah->foto = $request->file('foto')->store('profile', 'public');
+            $profil->foto_gedung = $request->file('foto_gedung')->store('profil', 'public');
         }
 
-        $profilSekolah->save();
+        // 6. Simpan ke Database
+        $profil->save();
 
-        return redirect()
-            ->route('admin.profil-sekolah')
-            ->with('success', 'Profile sekolah berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Profil Sekolah berhasil disimpan!');
     }
 }

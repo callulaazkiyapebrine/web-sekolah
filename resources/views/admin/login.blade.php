@@ -174,7 +174,7 @@
                                 <!-- Form -->
                                 <div class="flex-auto p-6">
 
-                                    <form method="POST" action="{{ route('admin.login.proses') }}">
+                                    <form method="POST" action="{{ route('login.proses') }}">
 
                                         @csrf
 

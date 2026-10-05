@@ -1,183 +1,222 @@
 @extends('admin_app')
 
-@section('title', 'Profile Sekolah')
+@section('title', $title ?? 'Profile Sekolah')
+@section('breadcrumb', 'Profile Sekolah')
 
 @section('content')
-<div class="flex flex-wrap -mx-3">
-    <!-- Kolom Kiri: Preview Identitas Sekolah -->
-    <div class="w-full max-w-full px-3 mb-6 lg:w-4/12 lg:mb-0">
-        <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border mb-6">
-            <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                <h6 class="font-bold text-slate-700 mb-0">
-                    <i class="fas fa-info-circle mr-1 text-purple-700"></i> Identitas Sekolah
-                </h6>
-            </div>
-            <div class="p-6 text-center">
-                @if ($profilSekolah->logo && file_exists(public_path('storage/' . $profilSekolah->logo)))
-                    <img src="{{ asset('storage/' . $profilSekolah->logo) }}" alt="Logo Sekolah" class="inline-flex items-center justify-center mx-auto mb-4 h-28 w-auto object-contain p-2 bg-gray-50 rounded-xl border border-gray-100 shadow-soft-sm" />
-                @else
-                    <img src="{{ asset('img/smk-ypc.png') }}" alt="Logo Sekolah" class="inline-flex items-center justify-center mx-auto mb-4 h-28 w-auto object-contain p-2 bg-gray-50 rounded-xl border border-gray-100 shadow-soft-sm" />
-                @endif
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <h5 class="font-bold text-slate-800 text-lg mb-1">{{ $profilSekolah->nama_sekolah }}</h5>
-                <p class="text-xs font-semibold text-slate-400 mb-4">
-                    <i class="fas fa-user-tie mr-1"></i> {{ $profilSekolah->kepala_sekolah }}
-                </p>
-
-                <div class="border-t border-gray-100 pt-3">
-                    <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                        <li class="relative flex justify-between px-0 py-2 bg-white border-0 text-xs border-b border-gray-100">
-                            <span class="text-slate-500 font-semibold"><i class="fas fa-qrcode mr-1 text-purple-700"></i> NPSN:</span>
-                            <span class="font-bold text-slate-700">{{ $profilSekolah->npsn }}</span>
-                        </li>
-                        <li class="relative flex justify-between px-0 py-2 bg-white border-0 text-xs border-b border-gray-100">
-                            <span class="text-slate-500 font-semibold"><i class="fas fa-calendar-alt mr-1 text-purple-700"></i> Tahun Berdiri:</span>
-                            <span class="font-bold text-slate-700">{{ $profilSekolah->tahun_berdiri }}</span>
-                        </li>
-                        <li class="relative flex justify-between px-0 py-2 bg-white border-0 text-xs">
-                            <span class="text-slate-500 font-semibold"><i class="fas fa-phone mr-1 text-purple-700"></i> Kontak:</span>
-                            <span class="font-bold text-slate-700">{{ $profilSekolah->kontak }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        @if ($profilSekolah->foto && file_exists(public_path('storage/' . $profilSekolah->foto)))
-            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-                <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                    <h6 class="font-bold text-slate-700 mb-0">
-                        <i class="fas fa-image mr-1 text-purple-700"></i> Gedung Sekolah
+        <!-- KARTU 1: IDENTITAS SEKOLAH (PREVIEW) -->
+        <div class="lg:col-span-1">
+            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border h-full">
+                <div class="p-6 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                    <h6 class="mb-0 font-bold text-sky-950 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-sky-600"></i> Identitas Sekolah
                     </h6>
                 </div>
-                <div class="p-4">
-                    <img src="{{ asset('storage/' . $profilSekolah->foto) }}" alt="Gedung Sekolah" class="w-full h-48 object-cover rounded-xl shadow-soft-sm" />
+                <div class="flex-auto p-6 text-center">
+                    <!-- LOGO SEKOLAH -->
+                    <div class="mb-4">
+                        @if (isset($profil->logo) && file_exists(public_path('storage/' . $profil->logo)))
+                            <img src="{{ asset('storage/' . $profil->logo) }}" alt="Logo Sekolah"
+                                class="w-28 h-28 object-contain mx-auto drop-shadow-md">
+                        @else
+                            <img src="https://raw.githubusercontent.com/PKM-KC-2021/Assets/main/Tutwuri.png"
+                                alt="Logo Tut Wuri Handayani" class="w-28 h-28 object-contain mx-auto drop-shadow-md"
+                                onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png';">
+                        @endif
+                    </div>
+
+                    <h5 class="font-bold text-slate-800 text-lg mb-1">
+                        {{ $profil->nama_sekolah ?? 'SMK YPC TASIKMALAYA' }}
+                    </h5>
+                    <p class="text-xs text-slate-400 mb-6">
+                        <i class="fas fa-user-tie text-sky-500 mr-1"></i>
+                        {{ $profil->nama_kepala_sekolah ?? '-' }}
+                    </p>
+
+                    <!-- DETAIL RINCIAN -->
+                    <div class="border-t border-gray-100 pt-4 text-left space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 font-medium flex items-center gap-2">
+                                <i class="fas fa-th-large text-xs text-sky-600"></i> NPSN:
+                            </span>
+                            <span class="font-semibold text-slate-700">{{ $profil->npsn ?? '-' }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 font-medium flex items-center gap-2">
+                                <i class="fas fa-calendar-alt text-xs text-sky-600"></i> Tahun Berdiri:
+                            </span>
+                            <span class="font-semibold text-slate-700">{{ $profil->tahun_berdiri ?? '-' }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 font-medium flex items-center gap-2">
+                                <i class="fas fa-phone text-xs text-sky-600"></i> Kontak:
+                            </span>
+                            <span class="font-semibold text-slate-700">{{ $profil->no_telepon ?? '-' }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        @endif
-    </div>
+        </div>
 
-    <!-- Kolom Kanan: Form Edit Profile Sekolah -->
-    <div class="w-full max-w-full px-3 lg:w-8/12">
-        <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-            <div class="p-6 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                <h6 class="font-bold text-slate-700 mb-0">
-                    <i class="fas fa-pen-square mr-1 text-purple-700"></i> Form Pengaturan Profile Sekolah
-                </h6>
-            </div>
-
-            <!-- Action Form Menggunakan Route: admin.profil-sekolah.save -->
-            <form action="{{ route('admin.profil-sekolah.save') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+        <!-- KARTU 2: FORM EDIT / UPDATE PROFILE SEKOLAH -->
+        <div class="lg:col-span-2">
+            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                <div class="p-6 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                    <h6 class="mb-0 font-bold text-sky-950 flex items-center gap-2">
+                        <i class="fas fa-edit text-sky-600"></i> Edit Profile Sekolah
+                    </h6>
+                    <p class="text-xs text-slate-400 mb-0">Ubah dan perbarui data profil sekolah di bawah ini</p>
+                </div>
 
                 <div class="flex-auto p-6">
-                    <div class="flex flex-wrap -mx-3">
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/2">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Nama Sekolah <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama_sekolah" maxlength="40" value="{{ old('nama_sekolah', $profilSekolah->nama_sekolah) }}"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('nama_sekolah') border-red-500 @enderror" required>
-                            @error('nama_sekolah')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
+
+                    <!-- NOTIFIKASI SUKSES -->
+                    @if (session('success'))
+                        <div class="mb-4 p-4 bg-emerald-100 border border-emerald-400 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
+                            <i class="fas fa-check-circle text-emerald-600 text-base"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    @endif
+
+                    <!-- NOTIFIKASI ERROR VALIDASI -->
+                    @if ($errors->any())
+                        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-800 rounded-xl text-xs">
+                            <p class="font-bold mb-1">Terjadi kesalahan input:</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('admin.profile-sekolah.save') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <!-- NAMA SEKOLAH -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    Nama Sekolah <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="nama_sekolah"
+                                    value="{{ old('nama_sekolah', $profil->nama_sekolah ?? '') }}"
+                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                    required>
+                            </div>
+
+                            <!-- NAMA KEPALA SEKOLAH -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    Nama Kepala Sekolah <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="nama_kepala_sekolah"
+                                    value="{{ old('nama_kepala_sekolah', $profil->nama_kepala_sekolah ?? '') }}"
+                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                    required>
+                            </div>
                         </div>
 
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/2">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Nama Kepala Sekolah <span class="text-red-500">*</span></label>
-                            <input type="text" name="kepala_sekolah" maxlength="40" value="{{ old('kepala_sekolah', $profilSekolah->kepala_sekolah) }}"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('kepala_sekolah') border-red-500 @enderror" required>
-                            @error('kepala_sekolah')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <!-- NPSN -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    NPSN <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="npsn"
+                                    value="{{ old('npsn', $profil->npsn ?? '') }}"
+                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                    required>
+                            </div>
 
-                    <div class="flex flex-wrap -mx-3">
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/3">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">NPSN <span class="text-red-500">*</span></label>
-                            <input type="text" name="npsn" maxlength="10" value="{{ old('npsn', $profilSekolah->npsn) }}"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('npsn') border-red-500 @enderror" required>
-                            @error('npsn')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
-                        </div>
+                            <!-- TAHUN BERDIRI -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    Tahun Berdiri <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" name="tahun_berdiri"
+                                    value="{{ old('tahun_berdiri', $profil->tahun_berdiri ?? '') }}"
+                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                    required>
+                            </div>
 
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/3">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Tahun Berdiri <span class="text-red-500">*</span></label>
-                            <input type="number" name="tahun_berdiri" value="{{ old('tahun_berdiri', $profilSekolah->tahun_berdiri) }}"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('tahun_berdiri') border-red-500 @enderror" required>
-                            @error('tahun_berdiri')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/3">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">No. Kontak / Telepon <span class="text-red-500">*</span></label>
-                            <input type="text" name="kontak" maxlength="15" value="{{ old('kontak', $profilSekolah->kontak) }}"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('kontak') border-red-500 @enderror" required>
-                            @error('kontak')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Alamat Lengkap <span class="text-red-500">*</span></label>
-                        <textarea name="alamat" rows="2"
-                            class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('alamat') border-red-500 @enderror" required>{{ old('alamat', $profilSekolah->alamat) }}</textarea>
-                        @error('alamat')
-                            <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Visi & Misi Sekolah <span class="text-red-500">*</span></label>
-                        <textarea name="visi_misi" rows="4"
-                            class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('visi_misi') border-red-500 @enderror" required>{{ old('visi_misi', $profilSekolah->visi_misi) }}</textarea>
-                        @error('visi_misi')
-                            <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Deskripsi / Sambutan Sekolah</label>
-                        <textarea name="deskripsi" rows="3"
-                            class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all focus:border-fuchsia-300 focus:outline-none focus:transition-shadow @error('deskripsi') border-red-500 @enderror">{{ old('deskripsi', $profilSekolah->deskripsi) }}</textarea>
-                        @error('deskripsi')
-                            <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="flex flex-wrap -mx-3">
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/2">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Ganti Logo Sekolah</label>
-                            <input type="file" name="logo" accept="image/*"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all @error('logo') border-red-500 @enderror">
-                            <span class="text-xxs font-normal text-slate-400">Biarkan kosong jika tidak diubah. Format JPG/PNG (Maks: 2MB).</span>
-                            @error('logo')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
+                            <!-- NO KONTAK / TELEPON -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    No. Kontak / Telepon <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="no_telepon"
+                                    value="{{ old('no_telepon', $profil->no_telepon ?? '') }}"
+                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                    required>
+                            </div>
                         </div>
 
-                        <div class="w-full max-w-full px-3 mb-4 md:w-1/2">
-                            <label class="mb-2 ml-1 text-xs font-bold text-slate-700">Ganti Foto Gedung Sekolah</label>
-                            <input type="file" name="foto" accept="image/*"
-                                class="focus:shadow-soft-primary-outline text-sm leading-5.6 ease-soft block w-full rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-slate-700 transition-all @error('foto') border-red-500 @enderror">
-                            <span class="text-xxs font-normal text-slate-400">Biarkan kosong jika tidak diubah. Format JPG/PNG (Maks: 2MB).</span>
-                            @error('foto')
-                                <p class="text-xs text-red-500 mt-1 mb-0">{{ $message }}</p>
-                            @enderror
+                        <!-- ALAMAT LENGKAP -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                Alamat Lengkap <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="alamat" rows="2"
+                                class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                required>{{ old('alamat', $profil->alamat ?? '') }}</textarea>
                         </div>
-                    </div>
+
+                        <!-- VISI & MISI -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                Visi & Misi Sekolah <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="visi_misi" rows="3"
+                                class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                required>{{ old('visi_misi', $profil->visi_misi ?? '') }}</textarea>
+                        </div>
+
+                        <!-- DESKRIPSI / SAMBUTAN -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                Deskripsi / Sambutan Sekolah
+                            </label>
+                            <textarea name="deskripsi" rows="3"
+                                class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500">{{ old('deskripsi', $profil->deskripsi ?? '') }}</textarea>
+                        </div>
+
+                        <!-- UPLOAD FILE LOGO & FOTO GEDUNG -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    Ganti Logo Sekolah
+                                </label>
+                                <input type="file" name="logo"
+                                    class="w-full text-xs rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                                <p class="text-[10px] text-slate-400 mt-1">Biarkan kosong jika tidak diubah. Format JPG/PNG (Maks: 2MB).</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
+                                    Ganti Foto Gedung Sekolah
+                                </label>
+                                <input type="file" name="foto_gedung"
+                                    class="w-full text-xs rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                                <p class="text-[10px] text-slate-400 mt-1">Biarkan kosong jika tidak diubah. Format JPG/PNG (Maks: 2MB).</p>
+                            </div>
+                        </div>
+
+                        <!-- TOMBOL SUBMIT -->
+                        <div class="text-right">
+                            <button type="submit"
+                                class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer">
+                                <i class="fas fa-save text-xs"></i> SIMPAN PERUBAHAN
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="p-6 pt-0 flex justify-end">
-                    <button type="submit"
-                        class="px-6 py-3 text-xs font-bold text-white uppercase bg-gradient-to-tl from-purple-700 to-pink-500 rounded-lg shadow-soft-md hover:scale-102 transition-all cursor-pointer">
-                        <i class="fas fa-save mr-1"></i> Simpan Profile Sekolah
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
+
     </div>
-</div>
 @endsection

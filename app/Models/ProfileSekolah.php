@@ -9,18 +9,21 @@ class ProfileSekolah extends Model
 {
     use HasFactory;
 
-    // HUBUNGKAN KAN KE NAMA TABEL YANG BENAR
     protected $table = 'profil_sekolahs';
+
+    // TAMBAHKAN BARIS INI (Ganti 'id_profil' dengan nama kolom ID sebenarnya di tabel Anda)
+    protected $primaryKey = 'id_profil'; // Contoh jika nama kolomnya id_profil / id_sekolah
 
     protected $fillable = [
         'nama_sekolah',
+        'nama_kepala_sekolah',
         'npsn',
-        'kepala_sekolah',
         'tahun_berdiri',
-        'kontak',
+        'no_telepon',
         'alamat',
-        'deskripsi',
         'visi_misi',
+        'deskripsi',
         'logo',
+        'foto_gedung',
     ];
 }

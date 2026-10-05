@@ -9,17 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('profil_sekolahs', function (Blueprint $table) {
-            $table->id('id_profile');
-            $table->string('nama_sekolah');
-            $table->string('kepala_sekolah');
-            $table->string('foto', 100)->nullable();
-            $table->string('logo', 100)->nullable();
-            $table->string('npsn', 10);
-            $table->text('alamat');
-            $table->string('kontak', 15);
-            $table->text('visi_misi');
-            $table->year('tahun_berdiri');
-            $table->text('deskripsi');
+            $table->id();
+            $table->string('nama_sekolah')->nullable();
+            $table->string('nama_kepala_sekolah')->nullable();
+            $table->string('npsn')->nullable();
+            $table->year('tahun_berdiri')->nullable();
+            $table->string('no_telepon')->nullable();
+            $table->text('alamat')->nullable();
+            $table->text('visi_misi')->nullable();
+            $table->text('deskripsi')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('foto_gedung')->nullable();
             $table->timestamps();
         });
     }

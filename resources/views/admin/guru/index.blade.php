@@ -9,7 +9,7 @@
         z-index: 99999 !important;
         pointer-events: auto !important;
     }
-    .action-btn-group a, 
+    .action-btn-group a,
     .action-btn-group button {
         position: relative !important;
         z-index: 99999 !important;
@@ -19,7 +19,7 @@
 </style>
 
 <div class="card shadow-sm border-0" style="background-color: #ffffff; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
-    
+
     <!-- HEADER & TOMBOL TAMBAH -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
         <div>
@@ -30,7 +30,7 @@
                 Kelola informasi pengajar dan staf pengajar sekolah.
             </p>
         </div>
-        <a href="{{ route('admin.guru.addEdit') }}" 
+        <a href="{{ route('admin.guru.addEdit') }}"
            style="background: linear-gradient(310deg, #7928ca, #370b6d); color: #ffffff; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; box-shadow: 0 4px 6px rgba(50,50,93,.11); display: inline-flex; align-items: center;">
             + Tambah Guru
         </a>
@@ -114,24 +114,24 @@
                         <!-- AKSI -->
                         <td class="text-center" style="vertical-align: middle; padding: 12px; white-space: nowrap;">
                             <div class="action-btn-group" style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-                                
+
                                 <!-- DETAIL -->
-                                <a href="{{ route('admin.guru.show', ['id' => $encryptedId]) }}" 
+                                <a href="{{ route('admin.guru.show', ['id' => $encryptedId]) }}"
                                    class="btn btn-sm text-white font-weight-bold"
                                    style="background-color: #17a2b8; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; text-decoration: none; display: inline-block;">
                                     Detail
                                 </a>
 
                                 <!-- EDIT -->
-                                <a href="{{ route('admin.guru.addEdit', ['id' => $encryptedId]) }}" 
+                                <a href="{{ route('admin.guru.addEdit', ['id' => $encryptedId]) }}"
                                    class="btn btn-sm text-white font-weight-bold"
                                    style="background-color: #ffc107; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; text-decoration: none; display: inline-block;">
                                     Edit
                                 </a>
 
                                 <!-- HAPUS -->
-                                <button type="button" 
-                                        onclick="konfirmasiHapus('{{ route('admin.guru.destroy', ['id' => $encryptedId]) }}')" 
+                                <button type="button"
+                                        onclick="konfirmasiHapus('{{ route('admin.guru.destroy', ['id' => $encryptedId]) }}')"
                                         class="btn btn-sm text-white font-weight-bold"
                                         style="background-color: #dc3545; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; border: none; cursor: pointer;">
                                     Hapus
