@@ -8,9 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Ganti 'profil_sekolah' menjadi 'profil_sekolahs'
         Schema::table('profil_sekolahs', function (Blueprint $table) {
-            $table->string('principal')->nullable()->after('kepala_sekolah');
+            $table->string('principal')->nullable();
             // tambahkan kolom lain jika ada...
         });
     }

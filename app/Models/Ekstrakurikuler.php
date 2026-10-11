@@ -2,28 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str; // <-- Tambahkan baris ini di sini
 
 class Ekstrakurikuler extends Model
 {
-    use HasFactory;
-
-    // Tentukan nama tabel
     protected $table = 'ekstrakurikuler';
+    protected $primaryKey = 'id_ekstrakurikuler'; // Sesuaikan jika primary key anda id_ekstrakurikuler
 
-    // Tentukan primary key kustom
-    protected $primaryKey = 'id_ekskul';
-
-    // Field yang boleh diisi
     protected $fillable = [
         'nama_ekskul',
-        'slug',
-        'id_guru',
         'pembina',
         'jadwal_latihan',
         'deskripsi',
-        'gambar',
+        'foto',
     ];
 
     protected static function boot()
