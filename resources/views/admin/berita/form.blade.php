@@ -1,125 +1,115 @@
-
 @extends('admin_app')
 
-@section('title', isset($berita) && $berita->exists ? 'Edit Data Berita' : 'Tambah Data Berita')
+@section('title', isset($berita) ? 'Edit Data Berita' : 'Tambah Data Berita')
 
 @section('content')
-<div style="background-color: #ffffff; padding: 28px; border-radius: 16px; box-shadow: 0 20px 27px 0 rgba(0,0,0,0.05); max-width: 850px; margin: 0 auto 24px auto;">
+<div style="padding: 15px 20px;">
+    <!-- Container Utama Putih Bersih Card -->
+    <div style="background-color: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 800px; margin: 0 auto;">
 
-    <!-- HEADER FORM -->
-    <div style="margin-bottom: 24px; border-bottom: 1px solid #e9ecef; padding-bottom: 16px;">
-        <h4 style="margin: 0; font-weight: bold; color: #344767; font-size: 1.25rem;">
-            {{ isset($berita) && $berita->exists ? 'Form Edit Data Berita' : 'Form Tambah Data Berita Baru' }}
-        </h4>
-
-        <p style="margin: 4px 0 0 0; color: #8392ab; font-size: 0.875rem;">
-            Silakan isi formulir berita di bawah ini dengan lengkap dan benar.
-        </p>
-    </div>
-
-    <!-- NOTIFIKASI ERROR VALIDASI -->
-    @if ($errors->any())
-        <div style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
-            <ul style="margin: 0; padding-left: 20px;">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <!-- FORM UTAMA -->
-    <form
-        action="{{ isset($berita) && $berita->exists
-            ? route('admin.berita.save', $berita->getKey())
-            : route('admin.berita.save') }}"
-        method="POST"
-        enctype="multipart/form-data">
-
-        @csrf
-
-        <!-- JUDUL BERITA -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-weight: 600; color: #344767; font-size: 0.875rem; margin-bottom: 8px;">
-                Judul Berita <span style="color: red;">*</span>
-            </label>
-
-            <input
-                type="text"
-                name="judul"
-                value="{{ old('judul', $berita->judul ?? '') }}"
-                required
-                placeholder="Contoh: Kegiatan Workshop Digital Marketing di SMK YPC"
-                style="width: 100%; padding: 10px 14px; border: 1px solid #d2d6da; border-radius: 8px; font-size: 0.875rem; color: #495057; outline: none;">
+        {{-- HEADER --}}
+        <div style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #e9ecef;">
+            <h4 style="font-weight: 700; color: #212529; margin: 0 0 4px 0; font-size: 18px;">
+                {{ isset($berita) ? 'Form Edit Data Berita' : 'Form Tambah Data Berita Baru' }}
+            </h4>
+            <p style="color: #6c757d; font-size: 13px; margin: 0;">
+                Silakan isi formulir berita di bawah ini dengan lengkap dan benar.
+            </p>
         </div>
 
-        <!-- TANGGAL BERITA -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-weight: 600; color: #344767; font-size: 0.875rem; margin-bottom: 8px;">
-                Tanggal Berita
-            </label>
+        {{-- NOTIFIKASI ERROR VALIDASI --}}
+        @if ($errors->any())
+            <div style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;">
+                <ul style="margin: 0; padding-left: 20px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            <input
-                type="date"
-                name="tanggal"
-                value="{{ old('tanggal', $berita->tanggal ?? date('Y-m-d')) }}"
-                style="width: 100%; padding: 10px 14px; border: 1px solid #d2d6da; border-radius: 8px; font-size: 0.875rem; color: #495057; outline: none;">
-        </div>
+        {{-- FORM UTAMA DENGAN ENKRIPSI ID --}}
+        <form action="{{ isset($berita) && $berita ? route('admin.berita.save', Crypt::encrypt($berita->id_berita ?? $berita->id)) : route('admin.berita.save') }}"
+              method="POST"
+              enctype="multipart/form-data">
+            @csrf
 
-        <!-- GAMBAR BERITA -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-weight: 600; color: #344767; font-size: 0.875rem; margin-bottom: 8px;">
-                Gambar Header / Cover
-                <span style="font-weight: normal; color: #8392ab;">(Opsional, Maks 2MB)</span>
-            </label>
+            {{-- JUDUL BERITA --}}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
+                    Judul Berita <span style="color: red;">*</span>
+                </label>
+                <input type="text" name="judul" value="{{ old('judul', $berita->judul ?? '') }}" required placeholder="Contoh: Kegiatan Workshop Digital Marketing di Sekolah"
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">
+            </div>
 
-            @if(isset($berita) && $berita->exists && $berita->gambar && file_exists(public_path('storage/' . $berita->gambar)))
-                <div style="margin-bottom: 10px;">
-                    <img
-                        src="{{ asset('storage/' . $berita->gambar) }}"
-                        alt="Preview"
-                        style="max-width: 150px; border-radius: 8px; border: 1px solid #d2d6da;">
+            {{-- TANGGAL BERITA --}}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
+                    Tanggal Berita
+                </label>
+                <input type="date" name="tanggal" value="{{ old('tanggal', $berita->tanggal ?? date('Y-m-d')) }}"
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">
+            </div>
+
+            {{-- GAMBAR HEADER / COVER & LIVE PREVIEW --}}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
+                    Gambar Header / Cover <span style="color: #6c757d; font-weight: normal;">(Opsional, Maks 2MB)</span>
+                </label>
+
+                {{-- Area Pratinjau Gambar (Live Preview) --}}
+                <div style="margin-bottom: 12px;">
+                    <img id="imagePreview"
+                         src="{{ isset($berita) && $berita->gambar && file_exists(public_path('storage/' . $berita->gambar)) ? asset('storage/' . $berita->gambar) : '#' }}"
+                         alt="Pratinjau Gambar"
+                         style="width: 150px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #ced4da; {{ isset($berita) && $berita->gambar && file_exists(public_path('storage/' . $berita->gambar)) ? '' : 'display: none;' }}">
                 </div>
-            @endif
 
-            <input
-                type="file"
-                name="gambar"
-                accept="image/jpeg,image/png,image/jpg"
-                style="width: 100%; padding: 8px 14px; border: 1px solid #d2d6da; border-radius: 8px; font-size: 0.875rem; color: #495057; outline: none; background-color: #fff;">
-        </div>
+                <input type="file" name="gambar" id="fotoInput" accept="image/*" onchange="previewImage(event)"
+                       style="width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057;">
+            </div>
 
-        <!-- ISI BERITA -->
-        <div style="margin-bottom: 28px;">
-            <label style="display: block; font-weight: 600; color: #344767; font-size: 0.875rem; margin-bottom: 8px;">
-                Isi Berita Lengkap <span style="color: red;">*</span>
-            </label>
+            {{-- ISI BERITA LENGKAP --}}
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
+                    Isi Berita Lengkap <span style="color: red;">*</span>
+                </label>
+                <textarea name="isi" rows="6" required placeholder="Tuliskan isi berita atau pengumuman secara rinci di sini..."
+                          style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">{{ old('isi', $berita->isi ?? '') }}</textarea>
+            </div>
 
-            <textarea
-                name="isi"
-                rows="8"
-                required
-                placeholder="Tuliskan isi berita atau pengumuman secara rinci di sini..."
-                style="width: 100%; padding: 12px 14px; border: 1px solid #d2d6da; border-radius: 8px; font-size: 0.875rem; color: #495057; outline: none; line-height: 1.5;">{{ old('isi', $berita->isi ?? '') }}</textarea>
-        </div>
-
-        <!-- TOMBOL AKSI -->
-        <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e9ecef; padding-top: 20px;">
-
-            <a
-                href="{{ route('admin.berita.index') }}"
-                style="background-color: #8392ab; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; display: inline-block;">
-                Kembali
-            </a>
-
-            <button
-                type="submit"
-                class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition duration-200 shadow-sm">
-
-                {{ isset($berita) && $berita->exists ? 'Update Berita' : 'Simpan Berita' }}
-            </button>
-
-        </div>
-    </form>
+            {{-- TOMBOL AKSI --}}
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <a href="{{ route('admin.berita.index') }}"
+                   style="background-color: #6c757d; color: #ffffff; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-block;">
+                    Kembali
+                </a>
+                <button type="submit"
+                        style="background-color: #0d6efd; color: #ffffff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; box-shadow: 0 2px 4px rgba(13,110,253,0.2);">
+                    {{ isset($berita) ? 'Update Berita' : 'Simpan Berita' }}
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+{{-- SCRIPT JAVASCRIPT UNTUK PREVIEW GAMBAR --}}
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block'; // Memunculkan kotak gambar saat file dipilih
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 @endsection

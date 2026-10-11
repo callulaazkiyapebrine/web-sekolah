@@ -56,7 +56,7 @@
                     <a href="{{ route('galeri') }}" class="hover:text-sky-600 transition">Galeri</a>
                 </nav>
 
-                <!-- Tombol Admin / Login -->
+                {{-- <!-- Tombol Admin / Login -->
                 <div>
                     @auth
                         <a href="{{ route('admin.dashboard') }}"
@@ -69,7 +69,7 @@
                             <i class="fas fa-sign-in-alt mr-1"></i> Masuk Admin
                         </a>
                     @endauth
-                </div>
+                </div> --}}
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">

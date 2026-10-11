@@ -127,7 +127,7 @@
                         <img src="{{ asset('storage/' . $ekstrakurikuler->foto) }}" alt="{{ $ekstrakurikuler->nama_ekstrakurikuler }}"
                             class="w-full h-auto object-cover rounded-xl border border-slate-100">
                     @elseif ($ekstrakurikuler->gambar && file_exists(public_path('storage/' . $ekstrakurikuler->gambar)))
-                        <img src="{{ asset('storage/' . $ekstrakurikuler->gambar) }}" alt="{{ $ekstrakurikuler->nama_ekskul }}"
+                        <img src="{{ asset('storage/' . $ekstrakurikuler->gambar) }}" alt="{{ $ekstrakurikuler->nama_ekstrakurikuler }}"
                             class="w-full h-auto object-cover rounded-xl border border-slate-100">
                     @else
                         <div
@@ -160,7 +160,7 @@
                     class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex justify-between items-center text-sm">
                     <span class="text-slate-500 font-medium">Pembina / Pengampu</span>
                     <span
-                        class="font-bold text-slate-900">{{ $ekskul->pembina ?? ($ekskul->nama_pembina ?? '-') }}</span>
+                        class="font-bold text-slate-900">{{ $ekstrakurikuler->pembina ?? ($ekstrakurikuler->nama_pembina ?? '-') }}</span>
                 </div>
 
                 <!-- Deskripsi Lengkap -->

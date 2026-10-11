@@ -8,6 +8,8 @@ use App\Models\Galeri;
 use App\Models\Guru;
 use App\Models\ProfileSekolah;
 use App\Models\Siswa;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
 
 class LandingController extends Controller
 {
@@ -51,7 +53,19 @@ class LandingController extends Controller
 
     public function showGuru($id)
     {
-        $guru = Guru::findOrFail($id);
+        $guru = null;
+
+        try {
+            $decryptedId = Crypt::decrypt($id);
+            $guru = Guru::where('id_guru', $decryptedId)->first();
+        } catch (DecryptException $e) {
+            $guru = Guru::where('id_guru', $id)->first();
+        }
+
+        if (! $guru) {
+            return redirect()->route('public.guru')->with('error', 'Data guru tidak ditemukan.');
+        }
+
         $profil = ProfileSekolah::first();
 
         return view('public.guru-detail', compact('guru', 'profil'));
@@ -102,7 +116,19 @@ class LandingController extends Controller
 
     public function showGaleri($id)
     {
-        $galeri = Galeri::findOrFail($id);
+        $galeri = null;
+
+        try {
+            $decryptedId = Crypt::decrypt($id);
+            $galeri = Galeri::where('id_galeri', $decryptedId)->first();
+        } catch (DecryptException $e) {
+            $galeri = Galeri::where('id_galeri', $id)->first();
+        }
+
+        if (! $galeri) {
+            return redirect()->route('galeri')->with('error', 'Data galeri tidak ditemukan.');
+        }
+
         $profil = ProfileSekolah::first();
 
         return view('public.galeri-detail', compact('galeri', 'profil'));

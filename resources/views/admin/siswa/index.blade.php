@@ -24,6 +24,22 @@
             @endif
         </div>
 
+        {{-- NOTIFIKASI SUKSES (AUTO-HIDE 3 DETIK) --}}
+        @if (session('success'))
+            <div id="success-alert" style="background-color: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        {{-- NOTIFIKASI ERROR --}}
+        @if (session('error'))
+            <div style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         {{-- TABEL DATA --}}
         <div class="table-responsive">
             <table id="tableSiswa" class="table table-hover align-middle nowrap w-100">
@@ -68,7 +84,7 @@
                             {{-- TAHUN MASUK --}}
                             <td style="font-size: 14px; color: #495057;">{{ $tahunMasuk }}</td>
 
-                            {{-- AKSI (Tampil penuh untuk Admin, Strip (-) untuk Operator) --}}
+                            {{-- AKSI --}}
                             <td class="text-center">
                                 @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
                                     <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -120,10 +136,22 @@
 </div>
 @endsection
 
-{{-- DATATABLES SCRIPT --}}
+{{-- DATATABLES SCRIPT & AUTO-HIDE ALERT --}}
 @push('scripts')
     <script>
         $(document).ready(function () {
+            // Auto-hide alert sukses setelah 3 detik
+            const alertBox = document.getElementById('success-alert');
+            if (alertBox) {
+                setTimeout(function () {
+                    alertBox.style.transition = 'opacity 0.5s ease';
+                    alertBox.style.opacity = '0';
+                    setTimeout(function () {
+                        alertBox.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            }
+
             if (typeof $ === 'undefined' || !$.fn.DataTable) {
                 return;
             }

@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.galeri.save', isset($galeri) ? Crypt::encrypt($galeri->id_galeri) : '') }}"
+    <form action="{{ isset($galeri) && $galeri ? route('admin.galeri.save', Crypt::encrypt($galeri->id_galeri ?? $galeri->id)) : route('admin.galeri.save') }}"
           method="POST"
           enctype="multipart/form-data">
         @csrf
@@ -69,14 +69,18 @@
             <label style="display: block; font-weight: 600; color: #1e293b; font-size: 0.875rem; margin-bottom: 8px;">
                 Upload File Foto
             </label>
-            @if (isset($galeri) && $galeri->kategori == 'Foto' && !empty($galeri->file) && file_exists(public_path('storage/' . $galeri->file)))
-                <div style="margin-bottom: 12px;">
-                    <img src="{{ asset('storage/' . $galeri->file) }}" alt="Foto Galeri"
-                         style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1;">
-                </div>
-            @endif
-            <input type="file" name="file" id="fieldFoto" accept="image/*"
-                   style="width: 100%; padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.875rem; color: #334155;">
+
+            {{-- Area Pratinjau Gambar (Live Preview & Tampilkan Foto Lama jika ada) --}}
+            <div style="margin-bottom: 10px;">
+                <img id="imagePreview"
+                     src="{{ isset($galeri) && $galeri->kategori == 'Foto' && !empty($galeri->file) && file_exists(public_path('storage/' . $galeri->file)) ? asset('storage/' . $galeri->file) : '#' }}"
+                     alt="Pratinjau Foto"
+                     style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1; {{ isset($galeri) && $galeri->kategori == 'Foto' && !empty($galeri->file) ? '' : 'display: none;' }}">
+            </div>
+
+            <input type="file" name="file" id="fieldFoto" accept="image/*" onchange="previewImage(event)"
+                   style="width: 100%; padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.875rem; color: #334155; background: #fff;">
+            <span style="display: block; font-size: 11px; color: #64748b; margin-top: 4px;">Format: JPG, PNG. Max: 2MB</span>
         </div>
 
         <!-- INPUT LINK VIDEO -->
@@ -119,6 +123,23 @@
             secVideo.style.display = 'none';
             inFoto.disabled = false;
             inVideo.disabled = true;
+        }
+    }
+
+    // Fungsi untuk menampilkan live preview foto baru
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+
+            reader.readAsDataURL(input.files[0]);
         }
     }
 

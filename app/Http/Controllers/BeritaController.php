@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Berita;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 
 class BeritaController extends Controller
@@ -17,18 +19,21 @@ class BeritaController extends Controller
 
     public function addEdit($id = null)
     {
-        if ($id === null) {
-            $berita = new Berita;
+        $berita = null;
 
-            return view('admin.berita.form', compact('berita'));
-        }
+        if ($id !== null) {
+            try {
+                $decryptedId = Crypt::decrypt($id);
+                $berita = Berita::where('id_berita', $decryptedId)->first();
+            } catch (DecryptException $e) {
+                $berita = Berita::where('id_berita', $id)->first();
+            }
 
-        $berita = Berita::find($id);
-
-        if (! $berita) {
-            return redirect()
-                ->route('admin.berita.index')
-                ->with('error', 'Data berita tidak ditemukan.');
+            if (! $berita) {
+                return redirect()
+                    ->route('admin.berita.index')
+                    ->with('error', 'Data berita tidak ditemukan.');
+            }
         }
 
         return view('admin.berita.form', compact('berita'));
@@ -43,8 +48,15 @@ class BeritaController extends Controller
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        $berita = null;
+
         if ($id !== null) {
-            $berita = Berita::find($id);
+            try {
+                $decryptedId = Crypt::decrypt($id);
+                $berita = Berita::where('id_berita', $decryptedId)->first();
+            } catch (DecryptException $e) {
+                $berita = Berita::where('id_berita', $id)->first();
+            }
 
             if (! $berita) {
                 return redirect()
@@ -80,9 +92,18 @@ class BeritaController extends Controller
 
     public function show($id)
     {
-        $berita = Berita::with('user')
-            ->where('id_berita', $id)
-            ->first();
+        $berita = null;
+
+        try {
+            $decryptedId = Crypt::decrypt($id);
+            $berita = Berita::with('user')
+                ->where('id_berita', $decryptedId)
+                ->first();
+        } catch (DecryptException $e) {
+            $berita = Berita::with('user')
+                ->where('id_berita', $id)
+                ->first();
+        }
 
         if (! $berita) {
             return redirect()
@@ -95,7 +116,16 @@ class BeritaController extends Controller
 
     public function destroy($id)
     {
-        $berita = Berita::find($id);
+        $berita = null;
+
+        try {
+            $decryptedId = Crypt::decrypt($id);
+            $berita = Berita::where('id_berita', $decryptedId)
+                ->first();
+        } catch (DecryptException $e) {
+            $berita = Berita::where('id_berita', $id)
+                ->first();
+        }
 
         if (! $berita) {
             return redirect()

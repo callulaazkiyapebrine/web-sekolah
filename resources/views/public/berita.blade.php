@@ -56,21 +56,6 @@
                     <a href="{{ route('galeri') }}" class="hover:text-sky-600 transition">Galeri</a>
                 </nav>
 
-                <!-- Tombol Admin / Login -->
-                <div>
-                    @auth
-                        <a href="{{ route('admin.dashboard') }}"
-                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
-                            <i class="fas fa-gauge mr-1"></i> Dashboard Admin
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
-                            <i class="fas fa-sign-in-alt mr-1"></i> Masuk Admin
-                        </a>
-                    @endauth
-                </div>
-
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
                     <button @click="open = !open" class="text-gray-700 p-2">

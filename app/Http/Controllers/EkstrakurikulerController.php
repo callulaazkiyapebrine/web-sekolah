@@ -46,6 +46,7 @@ class EkstrakurikulerController extends Controller
     }
 
     // 3. Simpan / Update Data
+    // 3. Simpan / Update Data
     public function save(Request $request, $id = null)
     {
         $request->validate([
@@ -68,7 +69,7 @@ class EkstrakurikulerController extends Controller
             $ekstrakurikuler = new Ekstrakurikuler;
         }
 
-        $ekstrakurikuler->nama_ekskul = $request->nama_ekskul;
+        $ekstrakurikuler->nama_ekskul = $request->nama_ekskul; // Diubah ke nama_ekskul
         $ekstrakurikuler->id_guru = $request->id_guru ?? null;
         $ekstrakurikuler->pembina = $request->pembina;
         $ekstrakurikuler->jadwal_latihan = $request->jadwal_latihan;

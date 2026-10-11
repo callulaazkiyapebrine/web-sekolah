@@ -25,15 +25,15 @@
             @endif
         </div>
 
-        <!-- NOTIFIKASI SUKSES / ERROR -->
+        <!-- NOTIFIKASI SUKSES / ERROR (AUTO-HIDE 3 DETIK) -->
         @if (session('success'))
-            <div style="background-color: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
+            <div id="alertNotification" style="background-color: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem; transition: opacity 0.5s ease;">
                 {{ session('success') }}
             </div>
         @endif
 
         @if (session('error'))
-            <div style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
+            <div id="alertNotification" style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem; transition: opacity 0.5s ease;">
                 {{ session('error') }}
             </div>
         @endif
@@ -146,6 +146,15 @@
 @push('scripts')
     <script>
         $(document).ready(function () {
+            // Auto hide notification after 3 seconds
+            setTimeout(function() {
+                const alertEl = document.getElementById('alertNotification');
+                if (alertEl) {
+                    alertEl.style.opacity = '0';
+                    setTimeout(() => alertEl.remove(), 500);
+                }
+            }, 3000);
+
             if (typeof $ === 'undefined' || !$.fn.DataTable) {
                 return;
             }

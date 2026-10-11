@@ -57,21 +57,6 @@
                     <a href="{{ route('galeri') }}" class="hover:text-sky-600 transition">Galeri</a>
                 </nav>
 
-                <!-- Tombol Admin / Login -->
-                <div>
-                    @auth
-                        <a href="{{ route('admin.dashboard') }}"
-                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
-                            <i class="fas fa-gauge mr-1"></i> Dashboard Admin
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
-                            <i class="fas fa-sign-in-alt mr-1"></i> Masuk Admin
-                        </a>
-                    @endauth
-                </div>
-
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
                     <button @click="open = !open" class="text-gray-700 p-2">
@@ -119,10 +104,10 @@
                         <div class="w-full h-48 bg-sky-50 overflow-hidden relative">
                             @if ($item->foto && file_exists(public_path('storage/' . $item->foto)))
                                 <img src="{{ asset('storage/' . $item->foto) }}" class="w-full h-full object-cover"
-                                    alt="{{ $item->nama_ekskul ?? $item->nama }}">
+                                    alt="{{ $item->nama_ekstrakurikuler ?? $item->nama }}">
                             @elseif ($item->gambar && file_exists(public_path('storage/' . $item->gambar)))
                                 <img src="{{ asset('storage/' . $item->gambar) }}" class="w-full h-full object-cover"
-                                    alt="{{ $item->nama_ekskul ?? $item->nama }}">
+                                    alt="{{ $item->nama_ekstrakurikuler ?? $item->nama }}">
                             @else
                                 <div
                                     class="w-full h-full flex flex-col items-center justify-center text-sky-600 bg-sky-100">
@@ -135,7 +120,7 @@
                         <!-- INFORMASI EKSTRAKURIKULER -->
                         <div class="p-5">
                             <h3 class="font-bold text-gray-900 text-lg mb-1 capitalize">
-                                {{ $item->nama_ekskul ?? $item->nama }}
+                                {{ $item->nama_ekstrakurikuler ?? $item->nama }}
                             </h3>
                             <p class="text-xs font-semibold text-sky-600 mb-3">
                                 <i class="fas fa-user-tie mr-1"></i> Pembina:
@@ -149,7 +134,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('ekstrakurikuler.show', $item->slug ?? Str::slug($item->nama_ekskul)) }}"
+                    <a href="{{ route('ekstrakurikuler.show', $item->slug ?? Str::slug($item->nama_ekstrakurikuler)) }}"
                         class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-white bg-sky-50 hover:bg-sky-600 px-4 py-2.5 rounded-xl transition-all w-full justify-center text-center shadow-sm">
                         Lihat Detail <i class="fas fa-arrow-right text-[10px]"></i>
                     </a>

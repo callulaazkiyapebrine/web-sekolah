@@ -46,11 +46,10 @@ class SiswaController extends Controller
     {
         // 1. Validasi Input
         $request->validate([
-            'nisn' => 'required',
-            'nama_siswa' => 'required',
-            'kelas' => 'required', // <-- Tambahkan baris ini
-            'jenis_kelamin' => 'required',
-            'tahun_masuk' => 'required',
+            'nisn' => 'required|string|max:10', // Sesuaikan batas maksimal dengan kolom database Anda
+            'nama_siswa' => 'required|string|max:255',
+            'jenis_kelamin' => 'required|string',
+            'tahun_masuk' => 'required|string',
         ]);
 
         // 2. Dekripsi ID jika sedang Edit Data
@@ -62,7 +61,6 @@ class SiswaController extends Controller
             [
                 'nisn' => $request->nisn,
                 'nama_siswa' => $request->nama_siswa,
-                'kelas' => $request->kelas, // <-- PASTIKAN BARIS INI ADA!
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'tahun_masuk' => $request->tahun_masuk,
             ]

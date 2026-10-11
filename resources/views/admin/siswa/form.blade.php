@@ -51,15 +51,6 @@
                        style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">
             </div>
 
-            {{-- KELAS --}}
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
-                    Kelas <span style="color: red;">*</span>
-                </label>
-                <input type="text" name="kelas" value="{{ old('kelas', $siswa->kelas ?? '') }}" required placeholder="Contoh: 6 / Enam"
-                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">
-            </div>
-
             {{-- JENIS KELAMIN --}}
             <div style="margin-bottom: 20px;">
                 <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">

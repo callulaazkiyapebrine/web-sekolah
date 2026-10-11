@@ -55,22 +55,6 @@
                     <a href="{{ route('ekstrakurikuler') }}" class="hover:text-sky-600 transition">Ekstrakurikuler</a>
                     <a href="{{ route('galeri') }}" class="hover:text-sky-600 transition">Galeri</a>
                 </nav>
-
-                <!-- Tombol Admin / Login -->
-                <div>
-                    @auth
-                        <a href="{{ route('admin.dashboard') }}"
-                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
-                            <i class="fas fa-gauge mr-1"></i> Dashboard Admin
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
-                            <i class="fas fa-sign-in-alt mr-1"></i> Masuk Admin
-                        </a>
-                    @endauth
-                </div>
-
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
                     <button @click="open = !open" class="text-gray-700 p-2">
@@ -111,8 +95,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
             @forelse($guru as $item)
                 @php
-                    // Mengambil ID / Kunci guru secara dinamis
-                    $idGuru = $item->id ?? ($item->id_guru ?? ($item->guru_id ?? 1));
+                    // Mengambil ID secara dinamis (id_guru atau id) lalu di-encrypt
+                    $rawId = $item->id_guru ?? ($item->id ?? null);
+                    $encryptedId = $rawId ? Crypt::encrypt($rawId) : '';
                 @endphp
 
                 <div
@@ -140,8 +125,8 @@
                         </span>
                     </div>
 
-                    <!-- TOMBOL LIHAT DETAIL (LANGSUNG PAKAI URL HARDCODE) -->
-                    <a href="{{ url('/guru/' . $idGuru) }}"
+                    <!-- TOMBOL LIHAT DETAIL DENGAN ENKRIPSI ID -->
+                    <a href="{{ route('guru.show', $encryptedId) }}"
                         class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-white bg-sky-50 hover:bg-sky-600 px-4 py-2.5 rounded-xl transition-all w-full justify-center text-center shadow-sm">
                         Lihat Detail <i class="fas fa-arrow-right text-[10px]"></i>
                     </a>
