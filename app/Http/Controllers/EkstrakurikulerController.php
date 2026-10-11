@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Ekstrakurikuler;
 use App\Models\Guru;
+// use App\Models\ProfileSekolah;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Encryption\DecryptException;
 
 class EkstrakurikulerController extends Controller
 {
@@ -33,7 +34,7 @@ class EkstrakurikulerController extends Controller
                 $ekstrakurikuler = Ekstrakurikuler::where('id_ekskul', $id)->first();
             }
 
-            if (!$ekstrakurikuler) {
+            if (! $ekstrakurikuler) {
                 return redirect()->route('admin.ekstrakurikuler.index')->with('error', 'Data ekstrakurikuler tidak ditemukan.');
             }
         }
@@ -63,8 +64,8 @@ class EkstrakurikulerController extends Controller
             }
         }
 
-        if (!$ekstrakurikuler) {
-            $ekstrakurikuler = new Ekstrakurikuler();
+        if (! $ekstrakurikuler) {
+            $ekstrakurikuler = new Ekstrakurikuler;
         }
 
         $ekstrakurikuler->nama_ekskul = $request->nama_ekskul;
@@ -117,4 +118,13 @@ class EkstrakurikulerController extends Controller
 
         return redirect()->route('admin.ekstrakurikuler.index')->with('success', 'Data ekstrakurikuler berhasil dihapus.');
     }
+
+    // public function detailEkskul($slug)
+    // {
+    //     $profil = ProfileSekolah::first();
+    //     // Cari berdasarkan kolom slug
+    //     $ekskul = Ekstrakurikuler::where('slug', $slug)->firstOrFail();
+
+    //     return view('public.ekstrakurikuler-detail', compact('profil', 'ekskul'));
+    // }
 }

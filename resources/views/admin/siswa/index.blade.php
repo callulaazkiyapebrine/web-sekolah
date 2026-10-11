@@ -1,88 +1,167 @@
 @extends('admin_app')
 
-@section('title', 'Kelola Siswa')
+@section('title', 'Data Siswa')
 
 @section('content')
-<div style="background-color: #ffffff; padding: 24px; border-radius: 16px; box-shadow: 0 20px 27px 0 rgba(0,0,0,0.05); margin-bottom: 24px;">
+<div style="padding: 15px 20px;">
+    <!-- Container Utama Putih Bersih Card -->
+    <div style="background-color: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
 
-    <!-- HEADER: JUDUL & TOMBOL TAMBAH -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-        <h4 style="margin: 0; font-weight: bold; color: #344767; font-size: 1.25rem;">
-            Daftar Siswa Sekolah
-        </h4>
+        {{-- HEADER: Judul di Kiri & Tombol Tambah di Kanan Atas (Hanya untuk Admin) --}}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #e9ecef;">
+            <div>
+                <h4 style="font-weight: 700; color: #212529; margin: 0 0 4px 0; font-size: 18px;">Data Siswa</h4>
+                <p style="color: #6c757d; font-size: 13px; margin: 0;">Daftar data siswa sekolah.</p>
+            </div>
 
-        <!-- TOMBOL TAMBAH SISWA -->
-        <a href="{{ route('admin.siswa.addEdit') }}"
-           style="background: linear-gradient(310deg, #7928ca, #370b6d); color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; display: inline-flex; align-items: center; box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08); transition: all 0.2s ease;">
-            + Tambah Siswa
-        </a>
-    </div>
+            @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
+            <div>
+                <a href="{{ route('admin.siswa.addEdit') }}"
+                   style="display: inline-block; background-color: #0d6efd; color: #ffffff; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; box-shadow: 0 2px 4px rgba(13,110,253,0.2);">
+                    + Tambah Siswa
+                </a>
+            </div>
+            @endif
+        </div>
 
-    <!-- TABEL DATA SISWA -->
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; color: #67748e;">
-            <thead>
-                <tr style="border-bottom: 1px solid #e9ecef; background-color: #f8f9fa;">
-                    <th style="padding: 12px 16px; text-align: center; width: 50px;">No</th>
-                    <th style="padding: 12px 16px;">NISN</th>
-                    <th style="padding: 12px 16px;">Nama Siswa</th>
-                    <th style="padding: 12px 16px; text-align: center;">Jenis Kelamin</th>
-                    <th style="padding: 12px 16px; text-align: center;">Tahun Masuk</th>
-                    <th style="padding: 12px 16px; text-align: center; width: 150px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($siswa as $item)
-                    <tr style="border-bottom: 1px solid #e9ecef;">
-                        <td style="padding: 12px 16px; text-align: center;">{{ $loop->iteration }}</td>
-                        <td style="padding: 12px 16px;">
-                            <span style="background-color: #f1f3f5; padding: 4px 8px; border-radius: 4px; font-family: monospace;">
-                                {{ $item->nisn }}
-                            </span>
-                        </td>
-                        <td style="padding: 12px 16px; font-weight: 600; color: #344767;">{{ $item->nama_siswa }}</td>
-                        <td style="padding: 12px 16px; text-align: center;">
-                            @if ($item->jenis_kelamin == 'Laki-Laki')
-                                <span style="background-color: #e7f5ff; color: #1c7ed6; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">
-                                    Laki-Laki
-                                </span>
-                            @else
-                                <span style="background-color: #fff0f6; color: #d6336c; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">
-                                    Perempuan
-                                </span>
-                            @endif
-                        </td>
-                        <td style="padding: 12px 16px; text-align: center;">{{ $item->tahun_masuk }}</td>
-                        <td style="padding: 12px 16px; text-align: center;">
-                            <div style="display: flex; gap: 6px; justify-content: center;">
-                                <a href="{{ route('admin.siswa.show', ['id' => Crypt::encrypt($item->id)]) }}"
-                                   style="background-color: #17a2b8; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: bold;">
-                                    Detail
-                                </a>
-                                <a href="{{ route('admin.siswa.addEdit', ['id' => Crypt::encrypt($item->id)]) }}"
-                                   style="background-color: #ffc107; color: #212529; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: bold;">
-                                    Edit
-                                </a>
-                                <form action="{{ route('admin.siswa.delete', ['id' => Crypt::encrypt($item->id)]) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer;">
-                                        Hapus
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
+        {{-- TABEL DATA --}}
+        <div class="table-responsive">
+            <table id="tableSiswa" class="table table-hover align-middle nowrap w-100">
+
+                <thead class="table-light">
                     <tr>
-                        <td colspan="6" style="padding: 24px; text-align: center; color: #8392ab;">
-                            Belum ada data siswa.
-                        </td>
+                        <th class="text-center" style="width: 50px;">NO</th>
+                        <th>NISN</th>
+                        <th>NAMA SISWA</th>
+                        <th>JENIS KELAMIN</th>
+                        <th>TAHUN MASUK</th>
+                        <th class="text-center" style="width: 150px;">AKSI</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                </thead>
 
+                <tbody>
+                    @forelse ($siswa as $item)
+                        @php
+                            $namaSiswa = $item->nama_siswa ?? $item->nama ?? $item->name ?? '-';
+                            $nisn = $item->nisn ?? $item->nis ?? $item->nis_nisn ?? '-';
+                            $jk = $item->jenis_kelamin ?? $item->jk ?? '-';
+                            $tahunMasuk = $item->tahun_masuk ?? $item->angkatan ?? '-';
+                            $siswaId = $item->id_siswa ?? $item->id;
+                        @endphp
+                        <tr>
+                            {{-- NOMOR --}}
+                            <td class="text-center fw-semibold text-secondary">{{ $loop->iteration }}</td>
+
+                            {{-- NISN --}}
+                            <td style="font-size: 14px; color: #495057;">{{ $nisn }}</td>
+
+                            {{-- NAMA SISWA --}}
+                            <td>
+                                <div style="font-weight: 600; color: #212529; font-size: 14px;">
+                                    {{ $namaSiswa }}
+                                </div>
+                            </td>
+
+                            {{-- JENIS KELAMIN --}}
+                            <td style="font-size: 14px; color: #495057;">{{ $jk }}</td>
+
+                            {{-- TAHUN MASUK --}}
+                            <td style="font-size: 14px; color: #495057;">{{ $tahunMasuk }}</td>
+
+                            {{-- AKSI (Tampil penuh untuk Admin, Strip (-) untuk Operator) --}}
+                            <td class="text-center">
+                                @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                        {{-- DETAIL --}}
+                                        <a href="{{ route('admin.siswa.show', Crypt::encrypt($siswaId)) }}"
+                                           style="display: inline-block; background-color: #17a2b8; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
+                                           title="Detail">
+                                            Detail
+                                        </a>
+
+                                        {{-- EDIT --}}
+                                        <a href="{{ route('admin.siswa.addEdit', Crypt::encrypt($siswaId)) }}"
+                                           style="display: inline-block; background-color: #ffc107; color: #000000; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
+                                           title="Edit">
+                                            Edit
+                                        </a>
+
+                                        {{-- HAPUS --}}
+                                        <form action="{{ route('admin.siswa.delete', Crypt::encrypt($siswaId)) }}"
+                                              method="POST"
+                                              style="display: inline-block; margin: 0; padding: 0;"
+                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    style="background-color: #dc3545; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; border: none; cursor: pointer;"
+                                                    title="Hapus">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                @else
+                                    <span style="color: #6c757d; font-weight: 600;">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                Belum ada data siswa.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+        </div>
+    </div>
 </div>
 @endsection
+
+{{-- DATATABLES SCRIPT --}}
+@push('scripts')
+    <script>
+        $(document).ready(function () {
+            if (typeof $ === 'undefined' || !$.fn.DataTable) {
+                return;
+            }
+
+            if ($.fn.DataTable.isDataTable('#tableSiswa')) {
+                $('#tableSiswa').DataTable().destroy();
+            }
+
+            $('#tableSiswa').DataTable({
+                responsive: true,
+                autoWidth: false,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                order: [],
+
+                columnDefs: [
+                    {
+                        targets: [0, 5],
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                language: {
+                    search: 'Cari:',
+                    searchPlaceholder: '...',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data yang ditampilkan',
+                    zeroRecords: 'Data tidak ditemukan',
+                    emptyTable: 'Belum ada data siswa',
+
+                    paginate: {
+                        previous: 'Kembali',
+                        next: 'Lanjut'
+                    }
+                }
+            });
+        });
+    </script>
+@endpush

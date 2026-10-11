@@ -41,25 +41,34 @@ class GaleriController extends Controller
                     ->with('error', 'Data galeri tidak ditemukan.');
             }
         } else {
-            // Jika tidak ada ID, berarti menambah data baru.
             $galeri = new Galeri();
         }
 
-        // Validasi input
-        $request->validate([
+        // Aturan validasi
+        $rules = [
             'judul'      => 'required|string|max:50',
             'kategori'   => 'required|in:Foto,Video',
             'tanggal'    => 'required|date',
             'keterangan' => 'nullable|string',
-            'file'       => $id ? 'nullable|file|mimes:jpeg,png,jpg,mp4|max:10240' : 'required|file|mimes:jpeg,png,jpg,mp4|max:10240',
-        ], [
-            'judul.required'    => 'Judul dokumentasi wajib diisi.',
+        ];
+
+        // Validasi bersyarat sesuai Kategori
+        if ($request->kategori === 'Foto') {
+            $rules['file'] = $id ? 'nullable|image|mimes:jpeg,png,jpg|max:5048' : 'required|image|mimes:jpeg,png,jpg|max:5048';
+        } else {
+            $rules['file'] = $id ? 'nullable|url' : 'required|url';
+        }
+
+        $request->validate($rules, [
+            'judul.required'    => 'Judul galeri wajib diisi.',
             'judul.max'         => 'Judul maksimal 50 karakter.',
-            'kategori.required' => 'Pilih kategori media (Foto atau Video).',
-            'tanggal.required'  => 'Tanggal dokumentasi wajib diisi.',
-            'file.required'     => 'File foto atau video wajib diunggah.',
-            'file.mimes'        => 'Format file yang didukung: JPG, PNG, atau MP4.',
-            'file.max'          => 'Ukuran file maksimal 10MB.',
+            'kategori.required' => 'Pilih kategori (Foto atau Video).',
+            'tanggal.required'  => 'Tanggal wajib diisi.',
+            'file.required'     => $request->kategori === 'Foto' ? 'File foto wajib diunggah.' : 'Link video YouTube wajib diisi.',
+            'file.image'        => 'File yang diunggah harus berupa gambar.',
+            'file.mimes'        => 'Format gambar yang didukung: JPG, PNG, JPEG.',
+            'file.max'          => 'Ukuran gambar maksimal 5MB.',
+            'file.url'          => 'Format link video harus berupa URL valid (contoh: https://www.youtube.com/watch?v=xxxxxx).',
         ]);
 
         $galeri->judul      = $request->judul;
@@ -67,11 +76,24 @@ class GaleriController extends Controller
         $galeri->tanggal    = $request->tanggal;
         $galeri->keterangan = $request->keterangan;
 
-        if ($request->hasFile('file')) {
-            if ($galeri->file && Storage::disk('public')->exists($galeri->file)) {
-                Storage::disk('public')->delete($galeri->file);
+        // Proses simpan data
+        if ($request->kategori === 'Foto') {
+            if ($request->hasFile('file')) {
+                // Hapus berkas gambar lama jika sebelumnya berupa file
+                if ($galeri->file && !filter_var($galeri->file, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($galeri->file)) {
+                    Storage::disk('public')->delete($galeri->file);
+                }
+                $galeri->file = $request->file('file')->store('galeri', 'public');
             }
-            $galeri->file = $request->file('file')->store('galeri', 'public');
+        } else {
+            // Jika memilih kategori Video
+            if ($request->filled('file')) {
+                // Hapus berkas gambar lama jika sebelumnya merupakan Foto
+                if ($galeri->file && !filter_var($galeri->file, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($galeri->file)) {
+                    Storage::disk('public')->delete($galeri->file);
+                }
+                $galeri->file = $request->file;
+            }
         }
 
         $galeri->save();
@@ -89,7 +111,6 @@ class GaleriController extends Controller
     public function show($id)
     {
         try {
-            // Dekripsi ID (ganti spasi dengan + jika terdistorsi oleh browser)
             $decryptedId = Crypt::decrypt(str_replace(' ', '+', $id));
             $galeri = Galeri::where('id_galeri', $decryptedId)->firstOrFail();
 
@@ -109,7 +130,7 @@ class GaleriController extends Controller
                 ->with('error', 'Data galeri tidak ditemukan.');
         }
 
-        if ($galeri->file && Storage::disk('public')->exists($galeri->file)) {
+        if ($galeri->file && !filter_var($galeri->file, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($galeri->file)) {
             Storage::disk('public')->delete($galeri->file);
         }
 

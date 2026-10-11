@@ -18,12 +18,24 @@ class Ekstrakurikuler extends Model
     // Field yang boleh diisi
     protected $fillable = [
         'nama_ekskul',
+        'slug',
         'id_guru',
         'pembina',
         'jadwal_latihan',
         'deskripsi',
         'gambar',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($ekskul) {
+            if (empty($ekskul->slug) || $ekskul->isDirty('nama_ekskul')) {
+                $ekskul->slug = Str::slug($ekskul->nama_ekskul ?? $ekskul->nama);
+            }
+        });
+    }
 
     // Relasi ke Model Guru (Foreign Key id_guru)
     public function guru()

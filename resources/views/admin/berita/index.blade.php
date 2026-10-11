@@ -1,160 +1,284 @@
 @extends('admin_app')
 
 @section('title', 'Kelola Berita')
+@section('breadcrumb', 'Berita')
 
 @section('content')
-    <!-- CARD UTAMA -->
-    <div class="card shadow-sm border-0" style="background-color: #ffffff; border-radius: 16px; padding: 24px;">
-        
-        <!-- HEADER DALAM CARD -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div class="bg-white rounded-2xl shadow-soft-xl border border-sky-100 p-5 md:p-6">
+
+        {{-- HEADER --}}
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
-                <h4 style="margin: 0; font-weight: 700; color: #344767; font-size: 1.25rem;">
+                <h5 class="text-xl font-bold text-sky-950 mb-1">
                     Kelola Berita & Informasi Sekolah
-                </h4>
-                <p style="margin: 4px 0 0 0; color: #8392ab; font-size: 0.875rem;">
-                    Kelola dan publikasikan berita terbaru untuk informasi sekolah Anda.
+                </h5>
+
+                <p class="text-sm text-slate-500">
+                    Kelola dan publikasikan berita terbaru untuk informasi sekolah.
                 </p>
             </div>
-            <a href="{{ route('admin.berita.addEdit') }}" 
-               style="background: linear-gradient(310deg, #7928ca, #370b6d); color: #ffffff; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; box-shadow: 0 4px 6px rgba(50,50,93,.11); display: inline-flex; align-items: center;">
-                + Tambah Berita Baru
+
+            @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
+            <a href="{{ route('admin.berita.addEdit') }}"
+               class="inline-flex items-center justify-center gap-2
+                      bg-sky-600 hover:bg-sky-700 text-white
+                      text-sm font-semibold px-4 py-2.5 rounded-xl
+                      transition duration-200 shadow-sm">
+                <i class="fas fa-plus"></i>
+                Tambah Berita Baru
             </a>
+            @endif
         </div>
 
-        <!-- NOTIFIKASI SUKSES -->
+        {{-- NOTIFIKASI SUKSES --}}
         @if (session('success'))
-            <div style="background-color: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
-                {{ session('success') }}
+            <div class="mb-5 flex items-center gap-2 rounded-xl border border-emerald-200
+                        bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ session('success') }}</span>
             </div>
         @endif
 
-        <!-- FORM HAPUS GLOBAL (UNTUK MENGHINDARI BUG NESTED FORM IN TABLE) -->
-        <form id="globalDeleteForm" method="POST" style="display: none;">
-            @csrf
-            @method('DELETE')
-        </form>
+        {{-- NOTIFIKASI ERROR --}}
+        @if (session('error'))
+            <div class="mb-5 flex items-center gap-2 rounded-xl border border-red-200
+                        bg-red-50 px-4 py-3 text-sm text-red-700">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
 
-        <!-- TABEL -->
-        <div class="table-responsive">
-            <table id="tableBerita" class="table align-items-center mb-0" style="width: 100%;">
-                <thead>
-                    <tr style="background-color: #f8f9fa;">
-                        <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">NO</th>
-                        <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">COVER</th>
-                        <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">JUDUL & RINGKASAN</th>
-                        <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">TANGGAL</th>
-                        <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">PENULIS</th>
-                        <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">AKSI</th>
+        {{-- TABEL BERITA --}}
+        <div class="overflow-x-auto rounded-xl border border-slate-100">
+            <table id="tableBerita"
+                class="w-full min-w-[900px] text-sm text-left text-slate-600 border-collapse">
+
+                <thead class="bg-sky-50 text-sky-900 uppercase text-xs">
+                    <tr>
+                        <th class="px-4 py-4 text-center w-14">No</th>
+                        <th class="px-4 py-4 text-center w-24">Gambar</th>
+                        <th class="px-4 py-4">Judul & Isi</th>
+                        <th class="px-4 py-4 w-32">Tanggal</th>
+                        <th class="px-4 py-4 w-32">Penulis</th>
+                        <th class="px-4 py-4 text-center w-36">Status</th>
+                        <th class="px-4 py-4 text-center w-48">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach ($berita as $index => $item)
+
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($berita as $item)
                         @php
-                            $encryptedId = Crypt::encrypt($item->id_berita ?? $item->id);
+                            $beritaId = $item->getKey();
+                            $tanggalBerita = $item->tanggal ?? $item->created_at;
+                            $statusBerita = strtolower((string) ($item->status ?? 'Dipublikasikan'));
+                            $sudahPublikasi = in_array(
+                                $statusBerita,
+                                ['dipublikasikan', 'published', 'publish', '1', 'aktif'],
+                                true
+                            );
                         @endphp
-                        <tr>
-                            <!-- NOMOR -->
-                            <td class="text-center" style="vertical-align: middle; font-weight: 600; color: #344767; font-size: 0.875rem; padding: 12px;">
-                                {{ $index + 1 }}
+
+                        <tr class="hover:bg-sky-50/50 transition-colors">
+
+                            {{-- NOMOR --}}
+                            <td class="px-4 py-4 text-center text-xs font-semibold text-slate-500">
+                                {{ $loop->iteration }}
                             </td>
 
-                            <!-- COVER / GAMBAR -->
-                            <td style="vertical-align: middle; padding: 12px;">
-                                @if ($item->gambar && file_exists(public_path('storage/' . $item->gambar)))
-                                    <img src="{{ asset('storage/' . $item->gambar) }}" alt="Cover"
-                                        style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid #e9ecef;">
+                            {{-- GAMBAR --}}
+                            <td class="px-4 py-4 text-center">
+                                @if ($item->gambar)
+                                    <img src="{{ asset('storage/' . $item->gambar) }}"
+                                         alt="{{ $item->judul ?? 'Gambar berita' }}"
+                                         loading="lazy"
+                                         class="w-14 h-14 rounded-xl object-cover mx-auto
+                                                border border-slate-200 shadow-sm">
                                 @else
-                                    <img src="https://via.placeholder.com/44" alt="Default"
-                                        style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid #e9ecef;">
+                                    <div class="w-14 h-14 rounded-xl bg-slate-100
+                                                flex items-center justify-center mx-auto
+                                                border border-slate-200">
+                                        <i class="fas fa-image text-xl text-slate-400"></i>
+                                    </div>
                                 @endif
                             </td>
 
-                            <!-- JUDUL & RINGKASAN -->
-                            <td style="vertical-align: middle; padding: 12px;">
-                                <h6 style="margin: 0; font-weight: 700; color: #344767; font-size: 0.875rem; line-height: 1.3;">
-                                    {{ $item->judul }}
+                            {{-- JUDUL DAN ISI --}}
+                            <td class="px-4 py-4 max-w-sm">
+                                <h6 class="font-bold text-slate-800 text-sm mb-1">
+                                    {{ $item->judul ?? 'Tanpa judul' }}
                                 </h6>
-                                <p style="margin: 2px 0 0 0; color: #8392ab; font-size: 0.78rem; line-height: 1.3;">
-                                    {{ Str::limit(strip_tags($item->isi ?? $item->ringkasan), 50, '...') }}
+
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    {{ \Illuminate\Support\Str::limit(
+                                        strip_tags($item->isi ?? ''),
+                                        70
+                                    ) ?: 'Belum ada isi berita.' }}
                                 </p>
                             </td>
 
-                            <!-- TANGGAL -->
-                            <td style="vertical-align: middle; color: #8392ab; font-size: 0.825rem; padding: 12px; white-space: nowrap;">
-                                {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
+                            {{-- TANGGAL --}}
+                            <td class="px-4 py-4 text-xs text-slate-600 whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <i class="far fa-calendar-alt text-sky-500"></i>
+                                    <span>
+                                        @if ($tanggalBerita)
+                                            {{ \Carbon\Carbon::parse($tanggalBerita)->translatedFormat('d M Y') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </span>
+                                </div>
                             </td>
 
-                            <!-- PENULIS -->
-                            <td style="vertical-align: middle; color: #8392ab; font-size: 0.825rem; padding: 12px;">
-                                {{ $item->penulis ?? ($item->user->name ?? 'Admin') }}
+                            {{-- PENULIS --}}
+                            <td class="px-4 py-4 text-xs font-medium text-slate-700">
+                                {{ $item->user->name ?? 'Admin' }}
                             </td>
 
-                            <!-- AKSI -->
-                            <td class="text-center" style="vertical-align: middle; padding: 12px; white-space: nowrap;">
-                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-                                    
-                                    <!-- DETAIL -->
-                                    <a href="{{ route('admin.berita.show', $encryptedId) }}" 
-                                       class="btn btn-sm text-white font-weight-bold"
-                                       style="background-color: #17a2b8; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0;">
-                                        Detail
-                                    </a>
+                            {{-- STATUS --}}
+                            <td class="px-4 py-4 text-center">
+                                @if ($sudahPublikasi)
+                                    <span class="inline-flex items-center gap-1.5
+                                                 px-3 py-1.5 rounded-full
+                                                 bg-emerald-50 text-emerald-700
+                                                 border border-emerald-200
+                                                 text-[11px] font-semibold whitespace-nowrap">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Dipublikasikan
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5
+                                                 px-3 py-1.5 rounded-full
+                                                 bg-amber-50 text-amber-700
+                                                 border border-amber-200
+                                                 text-[11px] font-semibold whitespace-nowrap">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        {{ $item->status ?? 'Draft' }}
+                                    </span>
+                                @endif
+                            </td>
 
-                                    <!-- EDIT -->
-                                    <a href="{{ route('admin.berita.addEdit', $encryptedId) }}" 
-                                       class="btn btn-sm text-white font-weight-bold"
-                                       style="background-color: #ffc107; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0;">
-                                        Edit
-                                    </a>
+                            {{-- AKSI --}}
+                            <td class="px-3 py-4 text-center">
+                                @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
+                                    <div style="display: flex; items-center; justify-content: center; gap: 6px;">
 
-                                    <!-- HAPUS (MEMANGGIL JS) -->
-                                    <button type="button" 
-                                            onclick="konfirmasiHapus('{{ route('admin.berita.delete', $encryptedId) }}')" 
-                                            class="btn btn-sm text-white font-weight-bold"
-                                            style="background-color: #dc3545; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; border: none;">
-                                        Hapus
-                                    </button>
+                                        {{-- DETAIL --}}
+                                        <a href="{{ url('admin/berita/show/' . $beritaId) }}"
+                                           style="display: inline-block; background-color: #17a2b8; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
+                                           title="Lihat detail berita">
+                                            Detail
+                                        </a>
 
+                                        {{-- EDIT --}}
+                                        <a href="{{ url('admin/berita/add-edit/' . $beritaId) }}"
+                                           style="display: inline-block; background-color: #ffc107; color: #000000; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
+                                           title="Edit berita">
+                                            Edit
+                                        </a>
+
+                                        {{-- HAPUS --}}
+                                        <form action="{{ url('admin/berita/delete/' . $beritaId) }}"
+                                              method="POST"
+                                              style="display: inline-block; margin: 0; padding: 0;"
+                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    style="background-color: #dc3545; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; border: none; cursor: pointer;"
+                                                    title="Hapus berita">
+                                                Hapus
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                @else
+                                    <span style="color: #6c757d; font-weight: 600;">-</span>
+                                @endif
+                            </td>
+                        </tr>
+
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-4 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <div class="w-16 h-16 rounded-2xl bg-sky-50
+                                                flex items-center justify-center mb-3">
+                                        <i class="fas fa-newspaper text-3xl text-sky-300"></i>
+                                    </div>
+
+                                    <h6 class="text-sm font-bold text-slate-700 mb-1">
+                                        Belum Ada Berita
+                                    </h6>
+
+                                    <p class="text-xs text-slate-400">
+                                        Silakan klik tombol Tambah Berita Baru untuk menambahkan berita.
+                                    </p>
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @endforelse
                 </tbody>
             </table>
         </div>
+
+        {{-- FOOTER --}}
+        <div class="mt-4 text-xs text-slate-400">
+            Total berita:
+            <span class="font-semibold text-slate-600">
+                {{ $berita->count() }}
+            </span>
+        </div>
+
     </div>
+@endsection
 
-    <!-- SCRIPT KHUSUS UNTUK MEMASTIKAN DIKLIK -->
+{{-- DATATABLES --}}
+@push('scripts')
     <script>
-        function konfirmasiHapus(url) {
-            if (confirm('Apakah Anda yakin ingin menghapus berita ini?')) {
-                var form = document.getElementById('globalDeleteForm');
-                form.action = url;
-                form.submit();
+        $(document).ready(function () {
+            if (typeof $ === 'undefined' || !$.fn.DataTable) {
+                return;
             }
-        }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            if (typeof $ !== 'undefined' && $.fn.DataTable) {
-                $('#tableBerita').DataTable({
-                    "language": {
-                        "lengthMenu": "_MENU_ entries per page",
-                        "zeroRecords": "Tidak ada data berita ditemukan",
-                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                        "infoEmpty": "Showing 0 to 0 of 0 entries",
-                        "infoFiltered": "(filtered from _MAX_ total records)",
-                        "search": "Search:",
-                        "paginate": {
-                            "previous": "<",
-                            "next": ">"
-                        }
-                    },
-                    "pageLength": 10,
-                    "ordering": true,
-                    "autoWidth": false
-                });
+            if ($.fn.DataTable.isDataTable('#tableBerita')) {
+                $('#tableBerita').DataTable().destroy();
             }
+
+            $('#tableBerita').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: true,
+                searching: true,
+                autoWidth: false,
+                stateSave: false,
+                order: [],
+
+                columnDefs: [
+                    {
+                        targets: [0, 1, 6],
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                language: {
+                    search: 'Cari berita:',
+                    searchPlaceholder: 'Ketik judul berita...',
+                    lengthMenu: 'Tampilkan _MENU_ berita',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ berita',
+                    infoEmpty: 'Belum ada data berita',
+                    zeroRecords: 'Tidak ada berita yang cocok dengan pencarian.',
+                    emptyTable: 'Belum ada berita yang ditambahkan.',
+
+                    paginate: {
+                        first: 'Pertama',
+                        last: 'Terakhir',
+                        next: 'Berikutnya',
+                        previous: 'Sebelumnya'
+                    }
+                }
+            });
         });
     </script>
-@endsection
+@endpush

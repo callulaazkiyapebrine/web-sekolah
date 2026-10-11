@@ -1,164 +1,167 @@
 @extends('admin_app')
 
-@section('title', 'Kelola Data Guru')
+@section('title', 'Data Guru')
 
 @section('content')
-<style>
-    .action-btn-group {
-        position: relative !important;
-        z-index: 99999 !important;
-        pointer-events: auto !important;
-    }
-    .action-btn-group a,
-    .action-btn-group button {
-        position: relative !important;
-        z-index: 99999 !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-    }
-</style>
+    <div style="padding: 15px 20px;">
+        <!-- Container Utama Putih Bersih Card -->
+        <div style="background-color: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
 
-<div class="card shadow-sm border-0" style="background-color: #ffffff; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+            {{-- HEADER: Judul di Kiri & Tombol Tambah di Kanan Atas (Hanya untuk Admin) --}}
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #e9ecef;">
+                <div>
+                    <h4 style="font-weight: 700; color: #212529; margin: 0 0 4px 0; font-size: 18px;">Data Guru</h4>
+                    <p style="color: #6c757d; font-size: 13px; margin: 0;">Daftar data guru sekolah.</p>
+                </div>
 
-    <!-- HEADER & TOMBOL TAMBAH -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-        <div>
-            <h4 style="margin: 0; font-weight: 700; color: #344767; font-size: 1.25rem;">
-                Kelola Data Guru
-            </h4>
-            <p style="margin: 4px 0 0 0; color: #8392ab; font-size: 0.875rem;">
-                Kelola informasi pengajar dan staf pengajar sekolah.
-            </p>
+                @if (auth()->check() && strtolower(auth()->user()->role) === 'admin')
+                    <div>
+                        <a href="{{ route('admin.guru.addEdit') }}"
+                            style="display: inline-block; background-color: #0d6efd; color: #ffffff; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; box-shadow: 0 2px 4px rgba(13,110,253,0.2);">
+                            + Tambah Guru
+                        </a>
+                    </div>
+                @endif
+            </div>
+
+            {{-- TABEL DATA --}}
+            <div class="table-responsive">
+                <table id="tableGuru" class="table table-hover align-middle w-100">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" style="width: 50px;">NO</th>
+                            <th>FOTO</th>
+                            <th>NAMA GURU</th>
+                            <th>NIP</th>
+                            <th>MATA PELAJARAN</th>
+                            <th class="text-center" style="width: 150px;">AKSI</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($guru as $item)
+                            <tr>
+                                {{-- NOMOR --}}
+                                <td class="text-center fw-semibold text-secondary">{{ $loop->iteration }}</td>
+
+                                {{-- FOTO --}}
+                                <td>
+                                    @if (!empty($item->foto) && file_exists(public_path('storage/' . $item->foto)))
+                                        <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto"
+                                            style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                                    @else
+                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($item->nama_guru ?? 'Guru') }}&background=random"
+                                            alt="Avatar"
+                                            style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                                    @endif
+                                </td>
+
+                                {{-- NAMA GURU --}}
+                                <td>
+                                    <div style="font-weight: 600; color: #212529; font-size: 14px;">
+                                        {{ $item->nama_guru ?? ($item->nama ?? ($item->name ?? '-')) }}
+                                    </div>
+                                </td>
+
+                                {{-- NIP --}}
+                                <td style="font-size: 14px; color: #495057;">{{ $item->nip ?? '-' }}</td>
+
+                                {{-- MATA PELAJARAN --}}
+                                <td style="font-size: 14px; color: #495057;">{{ $item->mapel ?? '-' }}</td>
+
+                                {{-- AKSI --}}
+                                <td class="text-center">
+                                    @if (auth()->check() && strtolower(auth()->user()->role) === 'admin')
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            {{-- DETAIL --}}
+                                            <a href="{{ route('admin.guru.show', $item->id_guru) }}"
+                                                style="display: inline-block; background-color: #17a2b8; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
+                                                title="Detail">
+                                                Detail
+                                            </a>
+
+                                            {{-- EDIT --}}
+                                            <a href="{{ route('admin.guru.addEdit', $item->id_guru) }}"
+                                                style="display: inline-block; background-color: #ffc107; color: #000000; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
+                                                title="Edit">
+                                                Edit
+                                            </a>
+
+                                            {{-- HAPUS --}}
+                                            <form action="{{ route('admin.guru.destroy', $item->id_guru) }}" method="POST"
+                                                style="display: inline-block; margin: 0; padding: 0;"
+                                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    style="background-color: #dc3545; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; border: none; cursor: pointer;"
+                                                    title="Hapus">
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <span style="color: #6c757d; font-weight: 600;">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    Belum ada data guru.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+
+                </table>
+            </div>
         </div>
-        <a href="{{ route('admin.guru.addEdit') }}"
-           style="background: linear-gradient(310deg, #7928ca, #370b6d); color: #ffffff; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; box-shadow: 0 4px 6px rgba(50,50,93,.11); display: inline-flex; align-items: center;">
-            + Tambah Guru
-        </a>
     </div>
-
-    <!-- NOTIFIKASI -->
-    @if (session('success'))
-        <div style="background-color: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <!-- FORM HAPUS GLOBAL -->
-    <form id="globalDeleteForm" method="POST" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
-
-    <!-- TABEL DATA GURU -->
-    <div class="table-responsive">
-        <table id="tableGuru" class="table align-items-center mb-0" style="width: 100%;">
-            <thead>
-                <tr style="background-color: #f8f9fa;">
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px; width: 50px;">NO</th>
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px; width: 80px;">FOTO</th>
-                    <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">NIP</th>
-                    <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">NAMA GURU</th>
-                    <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">MATA PELAJARAN</th>
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px; width: 180px;">AKSI</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($guru as $item)
-                    @php
-                        $idRaw = $item->id_guru;
-                        $encryptedId = urlencode(Crypt::encrypt($idRaw));
-                    @endphp
-                    <tr>
-                        <!-- NO -->
-                        <td class="text-center" style="vertical-align: middle; font-weight: 600; color: #344767; font-size: 0.875rem; padding: 12px;">
-                            {{ $loop->iteration }}
-                        </td>
-
-                        <!-- FOTO -->
-                        <td class="text-center" style="vertical-align: middle; padding: 12px;">
-                            @if ($item->foto && file_exists(public_path('storage/' . $item->foto)))
-                                <img src="{{ asset('storage/' . $item->foto) }}" alt="{{ $item->nama_guru }}"
-                                     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef; display: inline-block;">
-                            @else
-                                <div style="width: 48px; height: 48px; border-radius: 50%; background: #e9ecef; color: #8392ab; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin: 0 auto;">
-                                    No Image
-                                </div>
-                            @endif
-                        </td>
-
-                        <!-- NIP -->
-                        <td style="vertical-align: middle; color: #8392ab; font-size: 0.875rem; padding: 12px;">
-                            {{ $item->nip ?? '-' }}
-                        </td>
-
-                        <!-- NAMA GURU -->
-                        <td style="vertical-align: middle; padding: 12px;">
-                            <h6 style="margin: 0; font-weight: 700; color: #344767; font-size: 0.875rem;">
-                                {{ $item->nama_guru }}
-                            </h6>
-                        </td>
-
-                        <!-- MAPEL -->
-                        <td style="vertical-align: middle; color: #344767; font-size: 0.875rem; padding: 12px;">
-                            <span style="background-color: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.75rem;">
-                                {{ $item->mapel ?? '-' }}
-                            </span>
-                        </td>
-
-                        <!-- AKSI -->
-                        <td class="text-center" style="vertical-align: middle; padding: 12px; white-space: nowrap;">
-                            <div class="action-btn-group" style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-
-                                <!-- DETAIL -->
-                                <a href="{{ route('admin.guru.show', ['id' => $encryptedId]) }}"
-                                   class="btn btn-sm text-white font-weight-bold"
-                                   style="background-color: #17a2b8; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; text-decoration: none; display: inline-block;">
-                                    Detail
-                                </a>
-
-                                <!-- EDIT -->
-                                <a href="{{ route('admin.guru.addEdit', ['id' => $encryptedId]) }}"
-                                   class="btn btn-sm text-white font-weight-bold"
-                                   style="background-color: #ffc107; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; text-decoration: none; display: inline-block;">
-                                    Edit
-                                </a>
-
-                                <!-- HAPUS -->
-                                <button type="button"
-                                        onclick="konfirmasiHapus('{{ route('admin.guru.destroy', ['id' => $encryptedId]) }}')"
-                                        class="btn btn-sm text-white font-weight-bold"
-                                        style="background-color: #dc3545; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; border: none; cursor: pointer;">
-                                    Hapus
-                                </button>
-
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center" style="padding: 32px; color: #8392ab;">
-                            Belum ada data guru yang tersimpan.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    function konfirmasiHapus(url) {
-        if (confirm('Apakah Anda yakin ingin menghapus data guru ini?')) {
-            var form = document.getElementById('globalDeleteForm');
-            form.action = url;
-            form.submit();
-        }
-    }
-</script>
 @endsection
+
+{{-- DATATABLES SCRIPT --}}
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            if (typeof $ === 'undefined' || !$.fn.DataTable) {
+                return;
+            }
+
+            if ($.fn.DataTable.isDataTable('#tableGuru')) {
+                $('#tableGuru').DataTable().destroy();
+            }
+
+            $('#tableGuru').DataTable({
+                responsive: true,
+                autoWidth: false,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                order: [],
+
+                columnDefs: [{
+                    targets: [0, 1, 5],
+                    orderable: false,
+                    searchable: false
+                }],
+
+                language: {
+                    search: 'Cari:',
+                    searchPlaceholder: '...',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data yang ditampilkan',
+                    zeroRecords: 'Data tidak ditemukan',
+                    emptyTable: 'Belum ada data guru',
+
+                    paginate: {
+                        previous: 'Kembali',
+                        next: 'Lanjut'
+                    }
+                }
+            });
+        });
+    </script>
+@endpush

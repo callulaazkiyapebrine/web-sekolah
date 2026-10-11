@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    //
+    // Menampilkan halaman login
     public function index()
     {
         return view('admin.login');
     }
 
+    // Proses Autentikasi
     public function processLogin(Request $request)
     {
         $credentials = $request->validate(
@@ -27,7 +28,9 @@ class AuthController extends Controller
             ]
         );
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
 
             $request->session()->regenerate();
 
@@ -43,6 +46,7 @@ class AuthController extends Controller
             ->onlyInput('email');
     }
 
+    // Proses Logout
     public function logout(Request $request)
     {
         Auth::logout();
@@ -50,7 +54,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Arahkan kembali ke nama route login admin
-        return redirect()->route('admin.login')->with('success', 'Berhasil logout!');
+        // Redirect ke route login (GET)
+        return redirect()->route('beranda')->with('success', 'Berhasil logout!');
     }
 }

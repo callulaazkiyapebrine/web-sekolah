@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Validation\Rule;
 
 class SiswaController extends Controller
 {
@@ -45,55 +44,31 @@ class SiswaController extends Controller
      */
     public function save(Request $request, $id = null)
     {
-        $decryptedId = null;
-
-        // Dekripsi ID jika ada
-        if ($id) {
-            try {
-                $decryptedId = Crypt::decrypt($id);
-                $siswa = Siswa::findOrFail($decryptedId);
-            } catch (\Exception $e) {
-                return redirect()
-                    ->route('admin.siswa.index')
-                    ->with('error', 'Data siswa tidak ditemukan.');
-            }
-        } else {
-            $siswa = new Siswa();
-        }
-
-        // Validasi input.
+        // 1. Validasi Input
         $request->validate([
-            'nisn'          => ['required', 'digits:10', Rule::unique('siswa', 'nisn')->ignore($decryptedId)],
-            'nama_siswa'    => ['required', 'string', 'max:40'],
-            'jenis_kelamin' => ['required', Rule::in(['Laki-Laki', 'Perempuan'])],
-            'tahun_masuk'   => ['required', 'digits:4', 'integer'],
-        ], [
-            'nisn.required'          => 'NISN wajib diisi.',
-            'nisn.digits'            => 'NISN harus 10 digit angka.',
-            'nisn.unique'            => 'NISN sudah terdaftar pada siswa lain.',
-            'nama_siswa.required'    => 'Nama siswa wajib diisi.',
-            'jenis_kelamin.required' => 'Pilih jenis kelamin.',
-            'tahun_masuk.required'   => 'Tahun masuk wajib diisi.',
-            'tahun_masuk.digits'     => 'Tahun masuk harus 4 digit angka.',
+            'nisn' => 'required',
+            'nama_siswa' => 'required',
+            'kelas' => 'required', // <-- Tambahkan baris ini
+            'jenis_kelamin' => 'required',
+            'tahun_masuk' => 'required',
         ]);
 
-        // Masukkan data ke model.
-        $siswa->nisn          = $request->nisn;
-        $siswa->nama_siswa    = $request->nama_siswa;
-        $siswa->jenis_kelamin = $request->jenis_kelamin;
-        $siswa->tahun_masuk   = $request->tahun_masuk;
+        // 2. Dekripsi ID jika sedang Edit Data
+        $siswaId = $id ? Crypt::decrypt($id) : null;
 
-        // Simpan data.
-        $siswa->save();
+        // 3. Simpan / Update ke Database
+        Siswa::updateOrCreate(
+            ['id' => $siswaId],
+            [
+                'nisn' => $request->nisn,
+                'nama_siswa' => $request->nama_siswa,
+                'kelas' => $request->kelas, // <-- PASTIKAN BARIS INI ADA!
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'tahun_masuk' => $request->tahun_masuk,
+            ]
+        );
 
-        return redirect()
-            ->route('admin.siswa.index')
-            ->with(
-                'success',
-                $decryptedId
-                    ? 'Data siswa berhasil diperbarui.'
-                    : 'Data siswa berhasil disimpan.'
-            );
+        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil disimpan!');
     }
 
     /**

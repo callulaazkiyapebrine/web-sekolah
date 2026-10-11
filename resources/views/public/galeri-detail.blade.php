@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $galeri->judul }} - {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- TOPBAR BIRU PENDIDIKAN -->
+    <div class="bg-sky-700 text-white text-xs py-2 px-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <span><i class="fas fa-school mr-1.5"></i> Website Resmi
+                {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}</span>
+            <span>NPSN: {{ data_get($profil, 'npsn', '-') }}</span>
+        </div>
+    </div>
+
+    <!-- NAVBAR UTAMA -->
+    <header x-data="{ open: false }" class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    @php $logoPath = data_get($profil, 'logo'); @endphp
+                    @if ($logoPath && file_exists(public_path('storage/' . $logoPath)))
+                        <img src="{{ asset('storage/' . $logoPath) }}" alt="Logo" class="w-10 h-10 object-contain">
+                    @else
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png"
+                            alt="Logo" class="w-10 h-10 object-contain">
+                    @endif
+                    <div>
+                        <span class="font-bold text-base md:text-lg text-gray-900 tracking-tight block leading-tight">
+                            {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}
+                        </span>
+                        <span class="text-[10px] text-sky-700 font-semibold tracking-wider uppercase">Dinas
+                            Pendidikan</span>
+                    </div>
+                </div>
+
+                <nav class="hidden md:flex items-center space-x-6 text-xs font-semibold text-gray-700">
+                    <a href="{{ route('beranda') }}" class="hover:text-sky-600 transition">Beranda</a>
+                    <a href="{{ url('/profil') }}" class="hover:text-sky-600 transition">Profil</a>
+                    <a href="{{ route('public.guru') }}" class="hover:text-sky-600 transition">Guru</a>
+                    <a href="{{ route('berita') }}" class="hover:text-sky-600 transition">Berita</a>
+                    <a href="{{ route('ekstrakurikuler') }}" class="hover:text-sky-600 transition">Ekstrakurikuler</a>
+                    <a href="{{ route('galeri') }}" class="text-sky-600 font-bold transition">Galeri</a>
+                </nav>
+
+                <div>
+                    @auth
+                        <a href="{{ route('admin.dashboard') }}"
+                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
+                            <i class="fas fa-gauge mr-1"></i> Dashboard Admin
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition">
+                            <i class="fas fa-sign-in-alt mr-1"></i> Masuk Admin
+                        </a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT DETAIL GALERI -->
+    <main class="py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
+
+        <!-- TOMBOL KEMBALI -->
+        <div class="mb-6">
+            <a href="{{ route('galeri') }}"
+                class="inline-flex items-center text-xs font-semibold text-sky-600 hover:text-sky-800 transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Galeri
+            </a>
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden p-6 space-y-6">
+
+            <!-- JUDUL & TANGGAL -->
+            <div class="border-b border-gray-100 pb-4">
+                <span
+                    class="bg-sky-100 text-sky-700 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
+                    {{ $galeri->kategori ?? 'Dokumentasi' }}
+                </span>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
+                    {{ $galeri->judul }}
+                </h1>
+                @if ($galeri->tanggal ?? $galeri->created_at)
+                    <p class="text-xs text-gray-400 mt-2">
+                        <i class="far fa-calendar-alt mr-1"></i>
+                        {{ \Carbon\Carbon::parse($galeri->tanggal ?? $galeri->created_at)->translatedFormat('d F Y') }}
+                    </p>
+                @endif
+            </div>
+
+            <!-- MEDIA UTAMA (BESAR 16:9) -->
+            <div class="relative w-full aspect-video bg-slate-900 rounded-xl overflow-hidden">
+                @if (($galeri->kategori ?? '') == 'Video')
+                    @if (\Illuminate\Support\Str::contains($galeri->file, ['youtube.com', 'youtu.be']))
+                        @php
+                            $youtubeId = '';
+                            if (
+                                preg_match(
+                                    '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/',
+                                    $galeri->file,
+                                    $match,
+                                )
+                            ) {
+                                $youtubeId = $match[1];
+                            }
+                        @endphp
+                        @if ($youtubeId)
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/{{ $youtubeId }}"
+                                frameborder="0" allowfullscreen></iframe>
+                        @else
+                            <a href="{{ $galeri->file }}" target="_blank"
+                                class="w-full h-full text-white flex flex-col items-center justify-center gap-2 hover:text-sky-400 transition">
+                                <i class="fab fa-youtube text-5xl text-red-600"></i>
+                                <span class="text-sm font-semibold">Tonton di YouTube</span>
+                            </a>
+                        @endif
+                    @else
+                        <video controls class="w-full h-full object-cover">
+                            <source src="{{ asset('storage/' . $galeri->file) }}" type="video/mp4">
+                            Browser Anda tidak mendukung pemutaran video.
+                        </video>
+                    @endif
+                @else
+                    @if ($galeri->file && file_exists(public_path('storage/' . $galeri->file)))
+                        <img src="{{ asset('storage/' . $galeri->file) }}" alt="{{ $galeri->judul }}"
+                            class="w-full h-full object-cover">
+                    @else
+                        <div
+                            class="w-full h-full flex flex-col items-center justify-center text-gray-400 text-xs gap-1 bg-slate-100">
+                            <i class="fas fa-image text-4xl"></i>
+                            <span>Foto tidak ditemukan</span>
+                        </div>
+                    @endif
+                @endif
+            </div>
+
+            <!-- DESKRIPSI / KETERANGAN LENGKAP -->
+            <div class="space-y-2">
+                <h3 class="font-bold text-gray-900 text-base">Keterangan Kegiatan</h3>
+                <p class="text-gray-600 text-sm md:text-base leading-relaxed">
+                    {!! nl2br(e($galeri->keterangan ?? 'Tidak ada keterangan tambahan.')) !!}
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER UTAMA -->
+    <footer class="bg-sky-600 text-white text-xs py-12 border-t border-sky-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Grid 3 Kolom -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8 pb-8 border-b border-sky-500/50">
+
+                <!-- Kolom 1: Profil / Deskripsi Sekolah -->
+                <div class="md:col-span-6 space-y-3">
+                    <h3 class="font-bold text-sm tracking-wider uppercase">
+                        {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}
+                    </h3>
+                    <p class="text-sky-100 text-[11px] leading-relaxed max-w-lg">
+                        {{ data_get($profil, 'deskripsi') ?? 'Website resmi sekolah yang mengunggulkan pendidikan terpadu, berakhlak mulia, cerdas, kreatif, berprestasi, dan berwawasan lingkungan untuk membentuk generasi masa depan yang unggul.' }}
+                    </p>
+                </div>
+
+                <!-- Kolom 2: Menu Navigasi -->
+                <div class="md:col-span-3 space-y-3">
+                    <h3 class="font-bold text-sm tracking-wider uppercase">Menu</h3>
+                    <ul class="space-y-2 text-sky-100 text-[11px]">
+                        <li><a href="{{ route('beranda') }}" class="hover:text-white transition">Beranda</a></li>
+                        <li><a href="{{ url('/profil') }}" class="hover:text-white transition">Profile Sekolah</a></li>
+                        <li><a href="{{ route('public.guru') }}" class="hover:text-white transition">Staf & Guru</a>
+                        </li>
+                        <li><a href="{{ route('berita') }}" class="hover:text-white transition">Berita</a></li>
+                        <li><a href="{{ route('galeri') }}" class="hover:text-white transition">Galeri</a></li>
+                        <li><a href="{{ route('ekstrakurikuler') }}"
+                                class="hover:text-white transition">Ekstrakurikuler</a></li>
+                    </ul>
+                </div>
+
+                <!-- Kolom 3: Kontak -->
+                <div class="md:col-span-3 space-y-3">
+                    <h3 class="font-bold text-sm tracking-wider uppercase">Kontak</h3>
+                    <div class="space-y-2 text-sky-100 text-[11px] leading-relaxed">
+                        <p class="flex items-start gap-2">
+                            <i class="fas fa-map-marker-alt mt-0.5 flex-shrink-0"></i>
+                            <span>{{ data_get($profil, 'alamat', 'Alamat sekolah belum diatur.') }}</span>
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <i class="fas fa-phone-alt flex-shrink-0"></i>
+                            <span>{{ data_get($profil, 'no_telepon') ?? (data_get($profil, 'telepon') ?? '-') }}</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Copyright Bawah -->
+            <div class="text-center text-sky-100 text-[11px]">
+                <p>&copy; {{ date('Y') }} {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}. Seluruh Hak
+                    Cipta Dilindungi.</p>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -11,10 +11,11 @@ return new class extends Migration
         // Ubah 'siswas' menjadi 'siswa'
         Schema::create('siswa', function (Blueprint $table) {
             $table->id();
-            $table->string('nisn', 10)->unique();
-            $table->string('nama_siswa', 40);
-            $table->enum('jenis_kelamin', ['Laki-Laki', 'Perempuan']);
-            $table->year('tahun_masuk');
+            $table->string('nisn');
+            $table->string('nama_siswa');
+            $table->string('kelas')->nullable(); // <-- Cukup tambahkan baris ini
+            $table->string('jenis_kelamin');
+            $table->integer('tahun_masuk');
             $table->timestamps();
         });
     }

@@ -1,152 +1,130 @@
 @extends('admin_app')
 
-@section('title', 'Kelola Galeri')
+@section('title', 'Data Galeri')
 
 @section('content')
-<style>
-    .action-btn-group {
-        position: relative !important;
-        z-index: 99999 !important;
-        pointer-events: auto !important;
-    }
-    .action-btn-group a, 
-    .action-btn-group button {
-        position: relative !important;
-        z-index: 99999 !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-    }
-</style>
+<div style="background-color: #ffffff; padding: 28px; border-radius: 16px; box-shadow: 0 20px 27px 0 rgba(0,0,0,0.05); margin-bottom: 24px;">
 
-<div class="card shadow-sm border-0" style="background-color: #ffffff; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
-    
     <!-- HEADER & TOMBOL TAMBAH -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #e9ecef; padding-bottom: 16px;">
         <div>
-            <h4 style="margin: 0; font-weight: 700; color: #344767; font-size: 1.25rem;">
-                Kelola Galeri Foto & Video
-            </h4>
-            <p style="margin: 4px 0 0 0; color: #8392ab; font-size: 0.875rem;">
-                Kelola file foto dan video dokumentasi kegiatan sekolah.
-            </p>
+            <h4 style="margin: 0; font-weight: bold; color: #1e293b; font-size: 1.25rem;">Data Galeri Sekolah</h4>
+            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.875rem;">Kelola dokumentasi foto dan video kegiatan sekolah.</p>
         </div>
-        <a href="{{ route('admin.galeri.addEdit') }}" 
-           style="background: linear-gradient(310deg, #7928ca, #370b6d); color: #ffffff; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; box-shadow: 0 4px 6px rgba(50,50,93,.11); display: inline-flex; align-items: center;">
+        <a href="{{ route('admin.galeri.addEdit') }}"
+           style="background: linear-gradient(310deg, #0284c7, #0369a1); color: #ffffff; text-decoration: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; font-size: 0.875rem; display: inline-block; box-shadow: 0 4px 6px rgba(2,132,199,.2);">
             + Tambah Galeri
         </a>
     </div>
 
-    <!-- NOTIFIKASI -->
-    @if (session('success'))
+    <!-- NOTIFIKASI SUKSES / ERROR -->
+    @if(session('success'))
         <div style="background-color: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
             {{ session('success') }}
         </div>
     @endif
 
-    @if (session('error'))
+    @if(session('error'))
         <div style="background-color: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.875rem;">
             {{ session('error') }}
         </div>
     @endif
 
-    <!-- FORM HAPUS GLOBAL -->
-    <form id="globalDeleteForm" method="POST" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
-
-    <!-- TABEL DATA GALERI -->
-    <div class="table-responsive">
-        <table id="tableGaleri" class="table align-items-center mb-0" style="width: 100%;">
+    <!-- TABEL DATA -->
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem;">
             <thead>
-                <tr style="background-color: #f8f9fa;">
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px; width: 50px;">NO</th>
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px; width: 100px;">PREVIEW</th>
-                    <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">JUDUL & KETERANGAN</th>
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">KATEGORI</th>
-                    <th style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px;">TANGGAL</th>
-                    <th class="text-center" style="color: #8392ab; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 12px; width: 180px;">AKSI</th>
+                <tr style="border-bottom: 2px solid #e9ecef; color: #64748b; text-transform: uppercase; font-size: 0.75rem;">
+                    <th style="padding: 12px; width: 50px; text-align: center;">NO</th>
+                    <th style="padding: 12px; text-align: center; width: 100px;">PREVIEW</th>
+                    <th style="padding: 12px;">JUDUL</th>
+                    <th style="padding: 12px; text-align: center;">KATEGORI</th>
+                    <th style="padding: 12px; text-align: center;">TANGGAL</th>
+                    <th style="padding: 12px; text-align: center; width: 220px;">AKSI</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($galeri as $item)
-                    @php
-                        $idRaw = $item->id_galeri;
-                        $encryptedId = urlencode(Crypt::encrypt($idRaw));
-                    @endphp
-                    <tr>
-                        <td class="text-center" style="vertical-align: middle; font-weight: 600; color: #344767; font-size: 0.875rem; padding: 12px;">
+                @forelse($galeri as $index => $item)
+                    <tr style="border-bottom: 1px solid #e9ecef;">
+                        <td style="padding: 12px; text-align: center; color: #334155; font-weight: 600;">
                             {{ $loop->iteration }}
                         </td>
 
-                        <td class="text-center" style="vertical-align: middle; padding: 12px;">
-                            @if ($item->file && file_exists(public_path('storage/' . $item->file)))
-                                @if ($item->kategori == 'Foto')
-                                    <img src="{{ asset('storage/' . $item->file) }}" alt="{{ $item->judul }}"
-                                         style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #e9ecef; display: inline-block;">
+                        <!-- KOLOM PREVIEW (HANDLE FOTO & VIDEO) -->
+                        <td style="padding: 12px; text-align: center;">
+                            @if ($item->kategori == 'Video')
+                                @php
+                                    $videoId = '';
+                                    if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $item->file, $match)) {
+                                        $videoId = $match[1];
+                                    }
+                                @endphp
+
+                                @if($videoId)
+                                    <img src="https://img.youtube.com/vi/{{ $videoId }}/mqdefault.jpg"
+                                         alt="Thumbnail Video"
+                                         style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1;">
                                 @else
-                                    <div style="width: 50px; height: 50px; border-radius: 8px; background: #212529; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin: 0 auto;">
+                                    <span style="background-color: #f1f5f9; color: #334155; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">
                                         Video
-                                    </div>
+                                    </span>
                                 @endif
                             @else
-                                <div style="width: 50px; height: 50px; border-radius: 8px; background: #e9ecef; color: #8392ab; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; margin: 0 auto;">
-                                    No File
-                                </div>
+                                @if ($item->file && file_exists(public_path('storage/' . $item->file)))
+                                    <img src="{{ asset('storage/' . $item->file) }}"
+                                         alt="Foto"
+                                         style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1;">
+                                @else
+                                    <span style="background-color: #f1f5f9; color: #64748b; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">
+                                        No File
+                                    </span>
+                                @endif
                             @endif
                         </td>
 
-                        <td style="vertical-align: middle; padding: 12px;">
-                            <h6 style="margin: 0; font-weight: 700; color: #344767; font-size: 0.875rem; line-height: 1.3;">
-                                {{ $item->judul }}
-                            </h6>
-                            <p style="margin: 2px 0 0 0; color: #8392ab; font-size: 0.78rem; line-height: 1.3;">
-                                {{ Str::limit(strip_tags($item->keterangan), 50, '...') }}
-                            </p>
+                        <td style="padding: 12px; color: #334155; font-weight: 600;">
+                            {{ $item->judul }}
                         </td>
 
-                        <td class="text-center" style="vertical-align: middle; padding: 12px;">
-                            <span style="padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; display: inline-block; {{ $item->kategori == 'Foto' ? 'background-color: #e0f2fe; color: #0369a1;' : 'background-color: #fef3c7; color: #b45309;' }}">
+                        <td style="padding: 12px; text-align: center;">
+                            <span style="background-color: {{ $item->kategori == 'Video' ? '#e0f2fe' : '#dcfce7' }}; color: {{ $item->kategori == 'Video' ? '#0369a1' : '#15803d' }}; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 0.75rem;">
                                 {{ $item->kategori }}
                             </span>
                         </td>
 
-                        <td style="vertical-align: middle; color: #8392ab; font-size: 0.825rem; padding: 12px; white-space: nowrap;">
-                            {{ $item->tanggal }}
+                        <td style="padding: 12px; text-align: center; color: #64748b;">
+                            {{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}
                         </td>
 
-                        <td class="text-center" style="vertical-align: middle; padding: 12px; white-space: nowrap;">
-                            <div class="action-btn-group" style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-                                
-                                <!-- DETAIL -->
-                                <a href="{{ route('admin.galeri.show', ['id' => $encryptedId]) }}" 
-                                   class="btn btn-sm text-white font-weight-bold"
-                                   style="background-color: #17a2b8; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; text-decoration: none; display: inline-block;">
+                        <!-- TOMBOL AKSI -->
+                        <td style="padding: 12px; text-align: center; white-space: nowrap;">
+                            <div style="display: inline-flex; gap: 4px; justify-content: center; align-items: center;">
+                                <a href="{{ route('admin.galeri.show', Crypt::encrypt($item->id_galeri)) }}"
+                                   style="background-color: #17a2b8; color: #fff; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: bold; display: inline-block;">
                                     Detail
                                 </a>
-
-                                <!-- EDIT -->
-                                <a href="{{ route('admin.galeri.addEdit', ['id' => $encryptedId]) }}" 
-                                   class="btn btn-sm text-white font-weight-bold"
-                                   style="background-color: #ffc107; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; text-decoration: none; display: inline-block;">
+                                <a href="{{ route('admin.galeri.addEdit', Crypt::encrypt($item->id_galeri)) }}"
+                                   style="background-color: #ffc107; color: #000; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: bold; display: inline-block;">
                                     Edit
                                 </a>
-
-                                <!-- HAPUS -->
-                                <button type="button" 
-                                        onclick="konfirmasiHapus('{{ route('admin.galeri.delete', ['id' => $encryptedId]) }}')" 
-                                        class="btn btn-sm text-white font-weight-bold"
-                                        style="background-color: #dc3545; border-radius: 6px; padding: 6px 12px; font-size: 0.75rem; margin: 0; border: none; cursor: pointer;">
-                                    Hapus
-                                </button>
-
+                                <form action="{{ route('admin.galeri.delete', Crypt::encrypt($item->id_galeri)) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');"
+                                      style="display: inline-block; margin: 0; padding: 0;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            style="background-color: #dc3545; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: inline-block;">
+                                        Hapus
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center" style="padding: 32px; color: #8392ab;">
-                            Belum ada file galeri yang tersimpan.
+                        <td colspan="6" style="padding: 24px; text-align: center; color: #64748b;">
+                            Belum ada data galeri yang ditambahkan.
                         </td>
                     </tr>
                 @endforelse
@@ -154,14 +132,4 @@
         </table>
     </div>
 </div>
-
-<script>
-    function konfirmasiHapus(url) {
-        if (confirm('Apakah Anda yakin ingin menghapus galeri ini?')) {
-            var form = document.getElementById('globalDeleteForm');
-            form.action = url;
-            form.submit();
-        }
-    }
-</script>
 @endsection

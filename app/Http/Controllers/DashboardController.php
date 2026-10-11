@@ -4,68 +4,72 @@ namespace App\Http\Controllers;
 
 use App\Models\Berita;
 use App\Models\Ekstrakurikuler;
-use App\Models\Galeri;
 use App\Models\Guru;
 use App\Models\ProfileSekolah;
 use App\Models\Siswa;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan halaman dashboard utama admin dengan statistik data nyata dari database.
-     */
-    public function index()
-    {
-        // 1. Menghitung total data dari masing-masing model
-        $totalGuru            = Guru::count();
-        $totalSiswa           = Siswa::count();
-        $totalBerita          = Berita::count();
-        $totalEkstrakurikuler = Ekstrakurikuler::count();
-        $totalGaleri          = Galeri::count();
-
-        // 2. Mengambil data profil sekolah
-        $profilSekolah = ProfileSekolah::first();
-
-        // 3. Mengambil berita terbaru untuk widget ringkasan
-        $beritaTerbaru = Berita::latest()->take(5)->get();
-
-        return view('public.dashboard', [
-            'title'                => 'Dashboard',
-            'totalGuru'            => $totalGuru,
-            'totalSiswa'           => $totalSiswa,
-            'totalBerita'          => $totalBerita,
-            'totalEkstrakurikuler' => $totalEkstrakurikuler,
-            'totalGaleri'          => $totalGaleri,
-            'profilSekolah'        => $profilSekolah,
-            'beritaTerbaru'        => $beritaTerbaru,
-        ]);
-    }
-
+    // Halaman Landing Page Publik
     public function publicDashboard()
     {
-        // 1. Menghitung total data dari masing-masing model
-        $totalGuru            = Guru::count();
-        $totalSiswa           = Siswa::count();
-        $totalBerita          = Berita::count();
+        // Ambil data profil sekolah
+        $profil = Schema::hasTable('profil_sekolahs')
+            ? DB::table('profil_sekolahs')->first()
+            : null;
+
+        // Ambil data pendukung
+        $berita = Schema::hasTable('beritas')
+            ? DB::table('beritas')->latest()->take(3)->get()
+            : collect();
+
+        $ekstrakurikuler = Schema::hasTable('ekstrakurikulers')
+            ? DB::table('ekstrakurikulers')->take(6)->get()
+            : collect();
+
+        $guru = Schema::hasTable('gurus')
+            ? DB::table('gurus')->take(8)->get()
+            : collect();
+
+        $galeri = Schema::hasTable('galeris')
+            ? DB::table('galeris')->latest()->take(6)->get()
+            : collect();
+
+        // Hitung statistik
+        $totalSiswa = Schema::hasTable('siswas') ? DB::table('siswas')->count() : 0;
+        $totalGuru = Schema::hasTable('gurus') ? DB::table('gurus')->count() : 0;
+        $totalEkskul = Schema::hasTable('ekstrakurikulers') ? DB::table('ekstrakurikulers')->count() : 0;
+
+        return view('landing.index', compact(
+            'profil',
+            'berita',
+            'ekstrakurikuler',
+            'guru',
+            'galeri',
+            'totalSiswa',
+            'totalGuru',
+            'totalEkskul'
+        ));
+    }
+
+    public function index()
+    {
+        $profil = ProfileSekolah::first(); // Tambahkan baris ini
+        $totalSiswa = Siswa::count();
+        $totalGuru = Guru::count();
         $totalEkstrakurikuler = Ekstrakurikuler::count();
-        $totalGaleri          = Galeri::count();
-
-        // 2. Mengambil data profil sekolah
-        $profilSekolah = ProfileSekolah::first();
-
-        // 3. Mengambil berita terbaru
+        $totalBerita = Berita::count();
         $beritaTerbaru = Berita::latest()->take(5)->get();
 
-        return view('public.dashboard', [
-            'title'                => 'Beranda Website Sekolah',
-            'totalGuru'            => $totalGuru,
-            'totalSiswa'           => $totalSiswa,
-            'totalBerita'          => $totalBerita,
-            'totalEkstrakurikuler' => $totalEkstrakurikuler,
-            'totalGaleri'          => $totalGaleri,
-            'profilSekolah'        => $profilSekolah,
-            'beritaTerbaru'        => $beritaTerbaru,
-        ]);
+        return view('admin.dashboard', compact(
+            'profil',
+            'totalSiswa',
+            'totalGuru',
+            'totalEkstrakurikuler',
+            'totalBerita',
+            'beritaTerbaru'
+        ));
     }
 }

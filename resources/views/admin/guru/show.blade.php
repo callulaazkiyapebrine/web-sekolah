@@ -1,78 +1,67 @@
 @extends('admin_app')
 
 @section('title', 'Detail Data Guru')
+@section('breadcrumb', 'Detail Guru')
 
 @section('content')
-<div style="background-color: #ffffff; padding: 28px; border-radius: 16px; box-shadow: 0 20px 27px 0 rgba(0,0,0,0.05); margin-bottom: 24px; max-width: 900px; margin-left: auto; margin-right: auto;">
-
-    <!-- HEADER DETAIL -->
-    <div style="border-bottom: 1px solid #e9ecef; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+<div class="bg-white rounded-2xl shadow-soft-xl p-6 border border-sky-100 max-w-4xl mx-auto">
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-6">
         <div>
-            <h4 style="margin: 0; font-weight: bold; color: #344767; font-size: 1.25rem;">
-                Detail Data Guru
-            </h4>
-            <p style="margin: 4px 0 0 0; color: #8392ab; font-size: 0.875rem;">
-                Informasi lengkap profil guru SMK YPC Tasikmalaya.
-            </p>
+            <h5 class="font-bold text-sky-950 text-xl mb-1">Detail Data Guru</h5>
+            <p class="text-xs text-slate-400 mb-0">Informasi lengkap profil guru sekolah.</p>
         </div>
-        <div>
-            <a href="{{ route('admin.guru.index') }}"
-               style="background-color: #8392ab; color: #ffffff; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; display: inline-block;">
-                &larr; Kembali
-            </a>
+        {{-- <a href="{{ route('admin.guru.index') }}" class="bg-slate-500 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded-xl transition-all">
+            &larr; Kembali
+        </a> --}}
+    </div>
+
+    <!-- CARD PROFIL (HEADER WARNA BIRU) -->
+    <div class="bg-gradient-to-r from-sky-600 to-blue-700 rounded-2xl p-6 text-center text-white mb-6 shadow-md">
+        <div class="w-24 h-24 rounded-full bg-white mx-auto mb-3 overflow-hidden border-4 border-white/30 shadow-inner flex items-center justify-center">
+            @if(isset($guru->foto) && file_exists(public_path('storage/' . $guru->foto)))
+                <img src="{{ asset('storage/' . $guru->foto) }}" alt="Foto Guru" class="w-full h-full object-cover">
+            @else
+                <i class="fas fa-user-circle text-6xl text-slate-300"></i>
+            @endif
+        </div>
+        <h4 class="font-bold text-xl mb-1">{{ $guru->nama ?? $guru->nama_guru ?? '-' }}</h4>
+        <p class="text-xs text-sky-100 mb-0 font-medium">NIP: {{ $guru->nip ?? '-' }}</p>
+    </div>
+
+    <!-- DETAIL INFORMASI -->
+    <div class="space-y-3">
+        <div class="flex justify-between items-center p-3.5 bg-slate-50/80 rounded-xl border border-slate-100">
+            <span class="text-xs font-semibold text-slate-600">NIP</span>
+            <span class="text-xs font-bold text-slate-800">{{ $guru->nip ?? '-' }}</span>
+        </div>
+
+        <div class="flex justify-between items-center p-3.5 bg-slate-50/80 rounded-xl border border-slate-100">
+            <span class="text-xs font-semibold text-slate-600">Mata Pelajaran</span>
+            <span class="text-xs font-bold text-slate-800">{{ $guru->mapel ?? $guru->mata_pelajaran ?? '-' }}</span>
+        </div>
+
+        <div class="flex justify-between items-center p-3.5 bg-slate-50/80 rounded-xl border border-slate-100">
+            <span class="text-xs font-semibold text-slate-600">Nama Lengkap</span>
+            <span class="text-xs font-bold text-slate-800">{{ $guru->nama ?? $guru->nama_guru ?? '-' }}</span>
+        </div>
+
+        <div class="flex justify-between items-center p-3.5 bg-slate-50/80 rounded-xl border border-slate-100">
+            <span class="text-xs font-semibold text-slate-600">Tanggal Terdaftar</span>
+            <span class="text-xs font-bold text-slate-800">
+                {{ \Carbon\Carbon::parse($guru->created_at ?? now())->translatedFormat('d F Y H:i') }}
+            </span>
         </div>
     </div>
 
-    <!-- PROFILE HERO / CARD HEAD -->
-    <div style="background: linear-gradient(310deg, #7928ca, #370b6d); border-radius: 12px; padding: 24px; color: #ffffff; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(121, 40, 202, 0.2);">
-        @if($guru->foto && file_exists(public_path('storage/' . $guru->foto)))
-            <img src="{{ asset('storage/' . $guru->foto) }}" alt="{{ $guru->nama_guru }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px auto; border: 3px solid rgba(255, 255, 255, 0.4); display: block;">
-        @else
-            <div style="width: 70px; height: 70px; background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 1.75rem; font-weight: bold; text-transform: uppercase;">
-                {{ substr($guru->nama_guru, 0, 1) }}
-            </div>
-        @endif
-        <h3 style="margin: 0; font-size: 1.5rem; font-weight: bold; color: #ffffff;">{{ $guru->nama_guru }}</h3>
-        <p style="margin: 4px 0 0 0; opacity: 0.85; font-size: 0.9rem;">NIP: {{ $guru->nip ?? '-' }}</p>
-    </div>
-
-    <!-- TABEL DETAIL DATA -->
-    <div style="border: 1px solid #e9ecef; border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem; text-align: left;">
-            <tbody>
-                <tr style="border-bottom: 1px solid #e9ecef; background-color: #f8f9fa;">
-                    <th style="padding: 14px 20px; width: 35%; color: #344767; font-weight: 600;">NIP</th>
-                    <td style="padding: 14px 20px; color: #495057; font-weight: bold;">{{ $guru->nip ?? '-' }}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e9ecef;">
-                    <th style="padding: 14px 20px; color: #344767; font-weight: 600;">Nama Lengkap</th>
-                    <td style="padding: 14px 20px; color: #495057;">{{ $guru->nama_guru }}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e9ecef; background-color: #f8f9fa;">
-                    <th style="padding: 14px 20px; color: #344767; font-weight: 600;">Mata Pelajaran</th>
-                    <td style="padding: 14px 20px; color: #495057; font-weight: bold;">{{ $guru->mapel }}</td>
-                </tr>
-                <tr>
-                    <th style="padding: 14px 20px; color: #344767; font-weight: 600;">Tanggal Terdaftar</th>
-                    <td style="padding: 14px 20px; color: #495057;">
-                        {{ $guru->created_at ? $guru->created_at->format('d F Y, H:i') : '-' }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e9ecef; padding-top: 20px;">
-        <a href="{{ route('admin.guru.index') }}"
-           style="background-color: #8392ab; color: #ffffff; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem;">
+    <!-- TOMBOL AKSI BOTTOM -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+        <a href="{{ route('admin.guru.index') }}" class="px-5 py-2 bg-slate-400 hover:bg-slate-500 text-white text-xs font-semibold rounded-xl transition-all">
             Kembali
         </a>
-        <a href="{{ route('admin.guru.addEdit', Crypt::encrypt($guru->id)) }}"
-           style="background: linear-gradient(310deg, #7928ca, #370b6d); color: #ffffff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.875rem; box-shadow: 0 4px 6px rgba(50,50,93,.11);">
+        <a href="{{ route('admin.guru.addEdit', $guru->id ?? '') }}" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm">
             Edit Data Guru
         </a>
     </div>
-
 </div>
 @endsection

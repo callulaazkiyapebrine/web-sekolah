@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Encryption\DecryptException;
 
 class GuruController extends Controller
 {
@@ -32,12 +32,12 @@ class GuruController extends Controller
                 $guru = Guru::where('id_guru', $id)->first();
             }
 
-            if (!$guru) {
+            if (! $guru) {
                 return redirect()->route('admin.guru.index')->with('error', 'Data guru tidak ditemukan.');
             }
         }
 
-        // Arahkan ke view FORM tambah/edit (add_edit.blade.php)
+        // Arahkan ke view FORM tambah/edit (form.blade.php)
         return view('admin.guru.form', compact('guru'));
     }
 
@@ -55,26 +55,25 @@ class GuruController extends Controller
         }
 
         // Validasi input
-        // Rule 'unique:guru,nip,'.$guruId.',id_guru' mengabaikan NIP milik sendiri saat Edit
         $request->validate([
             'nama_guru' => 'required|string|max:255',
-            'nip'       => 'nullable|string|max:50|unique:guru,nip,' . $guruId . ',id_guru',
-            'mapel'     => 'required|string|max:255',
-            'foto'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nip' => 'nullable|string|max:50|unique:guru,nip,'.$guruId.',id_guru',
+            'mapel' => 'required|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
             'nip.unique' => 'NIP sudah digunakan oleh guru lain. Silakan gunakan NIP yang berbeda.',
         ]);
 
         // Cari data jika edit, atau buat instance baru jika tambah
-        $guru = $guruId ? Guru::where('id_guru', $guruId)->first() : new Guru();
+        $guru = $guruId ? Guru::where('id_guru', $guruId)->first() : new Guru;
 
-        if (!$guru) {
-            $guru = new Guru();
+        if (! $guru) {
+            $guru = new Guru;
         }
 
         $guru->nama_guru = $request->nama_guru;
-        $guru->nip       = $request->nip;
-        $guru->mapel     = $request->mapel;
+        $guru->nip = $request->nip;
+        $guru->mapel = $request->mapel;
 
         // Upload Foto
         if ($request->hasFile('foto')) {
@@ -95,8 +94,13 @@ class GuruController extends Controller
         try {
             $decryptedId = Crypt::decrypt($id);
             $guru = Guru::where('id_guru', $decryptedId)->firstOrFail();
-        } catch (DecryptException $e) {
-            $guru = Guru::where('id_guru', $id)->firstOrFail();
+        } catch (\Exception $e) {
+            try {
+                // Fallback jika id dikirim tanpa di-encrypt
+                $guru = Guru::where('id_guru', $id)->firstOrFail();
+            } catch (\Exception $ex) {
+                return redirect()->route('admin.guru.index')->with('error', 'Data guru tidak ditemukan.');
+            }
         }
 
         return view('admin.guru.show', compact('guru'));

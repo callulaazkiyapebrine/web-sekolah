@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
 
-    <title>@yield('title', 'Dashboard') - SMK YPC TASIKMALAYA</title>
+    <title>@yield('title', 'Dashboard') - SDN PASIRSALAM</title>
 
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
@@ -21,8 +21,8 @@
     <link href="{{ asset('css/nucleo-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('css/nucleo-svg.css') }}" rel="stylesheet">
 
-    <!-- DATATABLES CSS LOKAL -->
-    <link rel="stylesheet" href="{{ asset('data_table/css/dataTables.bootstrap5.min.css') }}">
+    <!-- DATATABLES CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
@@ -36,67 +36,161 @@
     <!-- Soft UI -->
     <link href="{{ asset('css/soft-ui-dashboard-tailwind.css?v=1.0.5') }}" rel="stylesheet">
 
-    <!-- Custom Styling DataTables -->
+    <!-- ALPINE.JS CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- CUSTOM STYLING DATATABLES & ALPINE CLOAK -->
     <style>
-        .dataTables_wrapper .dataTables_length select,
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .dataTables_wrapper {
+            padding: 1rem 0;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            float: right;
+            text-align: right;
+        }
+
+        .dataTables_wrapper .dataTables_length {
+            float: left;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.375rem !important;
+            padding: 0.25rem 2rem 0.25rem 0.75rem !important;
+            margin: 0 0.5rem !important;
+            background-color: #fff !important;
+        }
+
         .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.35rem 0.75rem;
-            font-size: 0.875rem;
-            outline: none;
-            margin-bottom: 0.5rem;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            margin-left: 0.5rem !important;
+            outline: none !important;
+            background-color: #fff !important;
         }
+
         .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #0284c7;
+            border-color: #0284c7 !important;
+            box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2) !important;
         }
+
+        table.dataTable {
+            width: 100% !important;
+            margin-top: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+            border-collapse: collapse !important;
+        }
+
+        table.dataTable thead th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            font-weight: 700 !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            padding: 0.75rem 1rem !important;
+        }
+
+        table.dataTable tbody td {
+            padding: 0.75rem 1rem !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            vertical-align: middle !important;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            float: left;
+            padding-top: 0.85em;
+            color: #64748b !important;
+            font-size: 0.875rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            float: right;
+            padding-top: 0.5em;
+        }
+
         .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 0.25rem 0.75rem !important;
+            padding: 0.375rem 0.75rem !important;
+            margin-left: 0.25rem !important;
             border-radius: 0.375rem !important;
             border: 1px solid #e2e8f0 !important;
-            margin-left: 0.25rem;
+            background: #fff !important;
+            color: #334155 !important;
+            font-size: 0.875rem !important;
+            cursor: pointer;
         }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
             background: #0284c7 !important;
-            color: white !important;
+            color: #ffffff !important;
             border-color: #0284c7 !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        .dataTables_wrapper::after {
+            content: "";
+            clear: both;
+            display: table;
         }
     </style>
 
     @stack('styles')
 </head>
 
-<body class="m-0 font-sans text-base antialiased font-normal leading-default bg-gray-50 text-slate-500">
+<body class="m-0 font-sans text-base antialiased font-normal leading-default bg-gray-50 text-slate-500" x-data="{ sidebarOpen: false }">
+
+    <!-- OVERLAY BACKGROUND SAAT SIDEBAR MUNCUL DI MOBILE -->
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" x-cloak
+         class="fixed inset-0 z-980 bg-slate-900/50 transition-opacity xl:hidden"></div>
 
     <!-- SIDEBAR -->
     <aside
-        class="max-w-62.5 ease-nav-brand z-990 fixed inset-y-0 my-4 ml-4 block w-full -translate-x-full flex-wrap items-center justify-between overflow-y-auto rounded-2xl border-0 bg-white p-0 antialiased shadow-none transition-transform duration-200 xl:left-0 xl:translate-x-0">
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'"
+        class="max-w-62.5 ease-nav-brand z-990 fixed inset-y-0 my-4 ml-4 block w-full flex-wrap items-center justify-between overflow-y-auto rounded-2xl border-0 bg-white p-0 antialiased shadow-xl transition-transform duration-300 xl:left-0">
 
         <!-- LOGO & BRAND SIDEBAR -->
-        <div class="h-19.5">
-            <a class="flex items-center px-6 py-5 m-0 text-sm whitespace-nowrap text-slate-700 font-bold"
+        <div class="h-19.5 flex items-center justify-between px-6">
+            <a class="flex items-center m-0 text-sm whitespace-nowrap text-slate-700 font-bold"
                 href="{{ route('admin.dashboard') }}">
                 @php
-                    $profil = \Illuminate\Support\Facades\Schema::hasTable('profil_sekolahs')
+                    $profilLayout = \Illuminate\Support\Facades\Schema::hasTable('profil_sekolahs')
                         ? \DB::table('profil_sekolahs')->first()
                         : null;
                 @endphp
 
-                @if ($profil && $profil->logo && file_exists(public_path('storage/' . $profil->logo)))
-                    <img src="{{ asset('storage/' . $profil->logo) }}" alt="Logo Sekolah"
+                @if ($profilLayout && $profilLayout->logo && file_exists(public_path('storage/' . $profilLayout->logo)))
+                    <img src="{{ asset('storage/' . $profilLayout->logo) }}" alt="Logo Sekolah"
                         style="width:36px; height:36px; object-fit:contain;" class="drop-shadow-sm">
                 @else
                     <img src="https://raw.githubusercontent.com/PKM-KC-2021/Assets/main/Tutwuri.png"
-                        alt="Logo Tut Wuri Handayani"
-                        style="width:36px; height:36px; object-fit:contain;"
+                        alt="Logo Tut Wuri Handayani" style="width:36px; height:36px; object-fit:contain;"
                         class="drop-shadow-sm"
                         onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png';">
                 @endif
 
                 <span class="ml-3 font-bold text-slate-800 uppercase tracking-wider text-xs truncate">
-                    {{ $profil->nama_sekolah ?? 'SMK YPC TASIKMALAYA' }}
+                    {{ $profilLayout->nama_sekolah ?? 'SDN PASIRSALAM' }}
                 </span>
             </a>
+
+            <!-- TOMBOL CLOSE SIDEBAR DI MOBILE -->
+            <button @click="sidebarOpen = false" class="xl:hidden text-slate-400 hover:text-slate-700 p-1">
+                <i class="fas fa-times text-lg"></i>
+            </button>
         </div>
 
         <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent">
@@ -182,6 +276,8 @@
                     </a>
                 </li>
 
+                {{-- KELOLA USER HANYA MUNCUL JIKA ROLE ADMIN --}}
+                @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
                 <li class="mt-0.5 w-full">
                     <a href="{{ route('admin.user.index') }}"
                         class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 transition-colors {{ request()->routeIs('admin.user*') ? 'bg-sky-50 font-semibold text-sky-800 shadow-soft-xl' : 'hover:bg-slate-100' }}">
@@ -192,24 +288,37 @@
                         <span class="ml-1">Kelola User</span>
                     </a>
                 </li>
+                @endif
 
                 <li class="w-full mt-4">
                     <hr class="h-px bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent my-0">
                 </li>
 
+                <!-- TOMBOL LIHAT LANDING PAGE -->
                 <li class="mt-2 w-full">
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                        @csrf
-                    </form>
-                    <a href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                        class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 text-red-600 transition-colors hover:bg-red-50">
+                    <a href="{{ route('beranda') }}" target="_blank"
+                        class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg px-4 text-emerald-600 transition-colors hover:bg-emerald-50">
                         <div
-                            class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600">
-                            <i class="fas fa-sign-out-alt text-sm"></i>
+                            class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                            <i class="fas fa-globe text-sm"></i>
                         </div>
-                        <span class="ml-1 font-semibold">Logout</span>
+                        <span class="ml-1 font-semibold">Lihat Landing Page</span>
                     </a>
+                </li>
+
+                <!-- TOMBOL LOGOUT -->
+                <li class="mt-1 w-full">
+                    <form action="{{ route('logout') }}" method="POST" class="w-full">
+                        @csrf
+                        <button type="submit"
+                            class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center w-[calc(100%-2rem)] whitespace-nowrap rounded-lg px-4 text-red-600 transition-colors hover:bg-red-50 text-left cursor-pointer">
+                            <div
+                                class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                                <i class="fas fa-sign-out-alt text-sm"></i>
+                            </div>
+                            <span class="ml-1 font-semibold">Logout</span>
+                        </button>
+                    </form>
                 </li>
 
             </ul>
@@ -225,17 +334,24 @@
             class="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all shadow-none duration-250 ease-soft-in rounded-2xl lg:flex-nowrap lg:justify-start">
             <div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
 
-                <div>
-                    <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
-                        <li class="text-sm leading-normal">
-                            <a class="opacity-50 text-slate-700" href="javascript:;">Pages</a>
-                        </li>
-                        <li
-                            class="text-sm pl-2 capitalize leading-normal text-slate-700 before:float-left before:pr-2 before:text-gray-600 before:content-['/']">
-                            @yield('breadcrumb', 'Dashboard')
-                        </li>
-                    </ol>
-                    <h6 class="mb-0 font-bold capitalize">@yield('title', 'Dashboard')</h6>
+                <div class="flex items-center gap-3">
+                    <!-- TOMBOL HAMBURGER UNTUK MEMBUKA SIDEBAR DI MOBILE -->
+                    <button @click="sidebarOpen = !sidebarOpen" class="xl:hidden text-slate-700 text-lg p-1 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div>
+                        <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
+                            <li class="text-sm leading-normal">
+                                <a class="opacity-50 text-slate-700" href="javascript:;">Pages</a>
+                            </li>
+                            <li
+                                class="text-sm pl-2 capitalize leading-normal text-slate-700 before:float-left before:pr-2 before:text-gray-600 before:content-['/']">
+                                @yield('breadcrumb', 'Dashboard')
+                            </li>
+                        </ol>
+                        <h6 class="mb-0 font-bold capitalize">@yield('title', 'Dashboard')</h6>
+                    </div>
                 </div>
 
                 <div class="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
@@ -247,7 +363,7 @@
                             </span>
                             <input type="text"
                                 class="pl-8.75 text-sm w-full rounded-lg border border-solid border-gray-300 bg-white py-2 pr-3 text-gray-700"
-                                placeholder="Type here...">
+                                placeholder="Cari...">
                         </div>
                     </div>
 
@@ -276,7 +392,7 @@
                 <div class="flex flex-wrap items-center -mx-3 lg:justify-between">
                     <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-1/2">
                         <div class="text-sm leading-normal text-center text-slate-500 lg:text-left">
-                            © {{ date('Y') }} {{ $profil->nama_sekolah ?? 'SMK YPC TASIKMALAYA' }}
+                            © {{ date('Y') }} {{ $profilLayout->nama_sekolah ?? 'SDN PASIRSALAM' }}
                         </div>
                     </div>
                 </div>
@@ -288,7 +404,7 @@
     <!-- SCRIPTS CORE -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="{{ asset('data_table/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
     <!-- TEMPLATE PLUGINS -->
     <script src="{{ asset('js/plugins/chartjs.min.js') }}"></script>
@@ -296,13 +412,14 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="{{ asset('js/soft-ui-dashboard-tailwind.js?v=1.0.5') }}"></script>
 
-    <!-- AUTOMATISASI DATATABLES SUPER FLEXIBLE -->
+    <!-- AUTOMATISASI DATATABLES FLEXIBLE -->
     <script>
-        $(document).ready(function () {
-            $('table').each(function () {
+        $(document).ready(function() {
+            $.fn.dataTable.ext.errMode = 'none';
+
+            $('table').each(function() {
                 var $table = $(this);
 
-                // Perbaiki struktur HTML jika <thead> belum ada
                 if ($table.find('thead').length === 0) {
                     var $firstRow = $table.find('tr').first();
                     if ($firstRow.length > 0) {
@@ -311,34 +428,45 @@
                     }
                 }
 
-                // Bungkus baris sisa ke dalam <tbody> jika belum ada
                 if ($table.find('tbody').length === 0) {
                     var $rows = $table.find('tr').not($table.find('thead tr'));
                     var $tbody = $('<tbody></tbody>').append($rows);
                     $table.append($tbody);
                 }
 
-                // Inisialisasi DataTables
-                try {
-                    $table.DataTable({
-                        "language": {
-                            "search": "Cari:",
-                            "lengthMenu": "Tampilkan _MENU_ data",
-                            "zeroRecords": "Data tidak ditemukan",
-                            "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                            "infoEmpty": "Menampilkan 0 data",
-                            "infoFiltered": "(disaring dari _MAX_ total data)",
-                            "paginate": {
-                                "next": "Lanjut",
-                                "previous": "Kembali"
-                            }
-                        },
-                        "pageLength": 10,
-                        "responsive": true,
-                        "destroy": true
+                var totalTh = $table.find('thead th').length;
+                if (totalTh > 0) {
+                    $table.find('tbody tr').each(function() {
+                        var $tds = $(this).find('td');
+                        if ($tds.length === 1 && $tds.attr('colspan')) {
+                            $(this).remove();
+                        }
                     });
-                } catch (e) {
-                    console.log("Gagal memuat DataTables pada tabel ini:", e);
+                }
+
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    try {
+                        $table.DataTable({
+                            "language": {
+                                "search": "Cari:",
+                                "lengthMenu": "Tampilkan _MENU_ data",
+                                "zeroRecords": "Belum ada data yang tersimpan",
+                                "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                                "infoEmpty": "Menampilkan 0 data",
+                                "infoFiltered": "(disaring dari _MAX_ total data)",
+                                "paginate": {
+                                    "next": "Lanjut",
+                                    "previous": "Kembali"
+                                }
+                            },
+                            "pageLength": 10,
+                            "responsive": true,
+                            "autoWidth": false,
+                            "destroy": true
+                        });
+                    } catch (e) {
+                        console.log("Inisialisasi DataTables lewati tabel ini:", e);
+                    }
                 }
             });
         });

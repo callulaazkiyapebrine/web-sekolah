@@ -11,8 +11,8 @@ class ProfileSekolah extends Model
 
     protected $table = 'profil_sekolahs';
 
-    // TAMBAHKAN BARIS INI (Ganti 'id_profil' dengan nama kolom ID sebenarnya di tabel Anda)
-    protected $primaryKey = 'id_profil'; // Contoh jika nama kolomnya id_profil / id_sekolah
+    // Ubah ke 'id' (karena nama kolom ID di tabel database kamu adalah 'id', bukan 'id_profil')
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'nama_sekolah',

@@ -3,97 +3,122 @@
 @section('title', isset($user) ? 'Edit User' : 'Tambah User')
 
 @section('content')
-<div class="row">
-    {{-- Form dibuat full width (col-12) agar leluasa dan rapi --}}
-    <div class="col-12">
-        <div class="card {{ isset($user) ? 'card-warning' : 'card-primary' }} card-outline shadow-sm mb-4">
-            {{-- Header card: judul form di sebelah kiri --}}
-            <div class="card-header">
-                <h3 class="card-title mb-0">
-                    <i class="bi {{ isset($user) ? 'bi-pencil-square' : 'bi-plus-lg' }} me-1"></i>
-                    {{ isset($user) ? 'Form Edit Data User' : 'Form Tambah User Baru' }}
-                </h3>
+<div style="padding: 15px 20px;">
+    <!-- Container Utama Putih Bersih Card -->
+    <div style="background-color: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 800px; margin: 0 auto;">
+
+        {{-- HEADER FORM --}}
+        <div style="margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid #e9ecef;">
+            <h4 style="font-weight: 700; color: #212529; margin: 0 0 4px 0; font-size: 18px;">
+                {{ isset($user) ? 'Edit Data User' : 'Tambah User Baru' }}
+            </h4>
+            <p style="color: #6c757d; font-size: 13px; margin: 0;">
+                {{ isset($user) ? 'Perbarui informasi akun pengguna di bawah ini.' : 'Lengkapi formulir berikut untuk menambahkan pengguna baru.' }}
+            </p>
+        </div>
+
+        {{-- FORM INPUT --}}
+        <form action="{{ route('admin.user.save', isset($user) ? Crypt::encrypt($user->id) : null) }}" method="POST">
+            @csrf
+
+            <!-- Nama Lengkap -->
+            <div style="margin-bottom: 16px;">
+                <label for="name" style="display: block; font-weight: 600; font-size: 13px; color: #343a40; margin-bottom: 6px;">
+                    Nama Pengguna <span style="color: #dc3545;">*</span>
+                </label>
+                <input type="text"
+                       id="name"
+                       name="name"
+                       value="{{ old('name', $user->name ?? '') }}"
+                       placeholder="Masukkan nama pengguna"
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; outline: none; background-color: #f8f9fa;"
+                       required>
+                @error('name')
+                    <div style="color: #dc3545; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                @enderror
             </div>
 
-            <form action="{{ route('admin.user.save', isset($user) ? Crypt::encrypt($user->id) : null) }}" method="POST">
-                @csrf
+            <!-- Email -->
+            <div style="margin-bottom: 16px;">
+                <label for="email" style="display: block; font-weight: 600; font-size: 13px; color: #343a40; margin-bottom: 6px;">
+                    Alamat Email <span style="color: #dc3545;">*</span>
+                </label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       value="{{ old('email', $user->email ?? '') }}"
+                       placeholder="contoh@sekolah.sch.id"
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; outline: none; background-color: #f8f9fa;"
+                       required>
+                @error('email')
+                    <div style="color: #dc3545; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                @enderror
+            </div>
 
-                <div class="card-body">
-                    <!-- Nama Lengkap -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label fw-semibold">Nama Pengguna <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name ?? '') }}" placeholder="Contoh: Ahmad Fauzi" required>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+            <!-- Username -->
+            <div style="margin-bottom: 16px;">
+                <label for="username" style="display: block; font-weight: 600; font-size: 13px; color: #343a40; margin-bottom: 6px;">
+                    Username
+                </label>
+                <input type="text"
+                       id="username"
+                       name="username"
+                       value="{{ old('username', $user->username ?? '') }}"
+                       placeholder="Masukkan username"
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; outline: none; background-color: #f8f9fa;">
+                @error('username')
+                    <div style="color: #dc3545; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                @enderror
+            </div>
 
-                    <!-- Email -->
-                    <div class="mb-3">
-                        <label for="email" class="form-label fw-semibold">Alamat Email <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email ?? '') }}" placeholder="Contoh: user@sekolah.sch.id" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+            <!-- Role / Hak Akses -->
+            <div style="margin-bottom: 16px;">
+                <label for="role" style="display: block; font-weight: 600; font-size: 13px; color: #343a40; margin-bottom: 6px;">
+                    Role / Hak Akses <span style="color: #dc3545;">*</span>
+                </label>
+                <select id="role"
+                        name="role"
+                        style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; outline: none; background-color: #f8f9fa;"
+                        required>
+                    <option value="Admin" {{ old('role', strtolower($user->role ?? '')) == 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="Operator" {{ old('role', strtolower($user->role ?? '')) == 'operator' ? 'selected' : '' }}>Operator</option>
+                </select>
+                @error('role')
+                    <div style="color: #dc3545; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                @enderror
+            </div>
 
-                    <div class="row">
-                        <!-- Username -->
-                        <div class="col-md-6 mb-3">
-                            <label for="username" class="form-label fw-semibold">Username</label>
-                            <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username', $user->username ?? '') }}" placeholder="Kosongkan jika ingin dibuat otomatis">
-                            <small class="text-muted">Opsional (Maksimal 30 karakter).</small>
-                            @error('username')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+            <!-- Password -->
+            <div style="margin-bottom: 24px;">
+                <label for="password" style="display: block; font-weight: 600; font-size: 13px; color: #343a40; margin-bottom: 6px;">
+                    Password @if(!isset($user)) <span style="color: #dc3545;">*</span> @endif
+                </label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       placeholder="Masukkan password minimal 6 karakter"
+                       style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; outline: none; background-color: #f8f9fa;"
+                       {{ !isset($user) ? 'required' : '' }}>
+                @if(isset($user))
+                    <small style="color: #6c757d; font-size: 12px; display: block; margin-top: 4px;">Kosongkan jika tidak ingin mengubah password.</small>
+                @endif
+                @error('password')
+                    <div style="color: #dc3545; font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                @enderror
+            </div>
 
-                        <!-- Role -->
-                        <div class="col-md-6 mb-3">
-                            <label for="role" class="form-label fw-semibold">Role / Hak Akses <span class="text-danger">*</span></label>
-                            <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
-                                <option value="Admin" {{ old('role', strtolower($user->role ?? '')) == 'admin' ? 'selected' : '' }}>
-                                    Admin (Akses Penuh Seluruh Sistem)
-                                </option>
-                                <option value="Operator" {{ old('role', strtolower($user->role ?? '')) == 'operator' ? 'selected' : '' }}>
-                                    Operator (Akses Operasional Sekolah)
-                                </option>
-                            </select>
-                            @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label fw-semibold">
-                            Password
-                            @if(!isset($user)) <span class="text-danger">*</span> @endif
-                        </label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="Minimal 6 karakter" {{ !isset($user) ? 'required' : '' }}>
-                        @if(isset($user))
-                            <small class="text-muted d-block mt-1">Kosongkan jika tidak ingin mengubah password.</small>
-                        @endif
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                {{-- Footer card: tombol kembali di kiri, tombol simpan di kanan --}}
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('admin.user.index') }}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left me-1"></i> Kembali
-                        </a>
-                        <button type="submit" class="btn {{ isset($user) ? 'btn-warning' : 'btn-primary' }}">
-                            <i class="bi bi-save me-1"></i> {{ isset($user) ? 'Simpan Perubahan' : 'Simpan Data User' }}
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
+            <!-- FOOTER AKSI TOMBOL -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e9ecef; padding-top: 16px;">
+                <a href="{{ route('admin.user.index') }}"
+                   style="display: inline-block; background-color: #6c757d; color: #ffffff; padding: 8px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none;">
+                    Kembali
+                </a>
+                <button type="submit"
+                        style="background-color: #0d6efd; color: #ffffff; padding: 8px 24px; border-radius: 8px; font-weight: 600; font-size: 13px; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(13,110,253,0.2);">
+                    {{ isset($user) ? 'Simpan Perubahan' : 'Simpan Data' }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

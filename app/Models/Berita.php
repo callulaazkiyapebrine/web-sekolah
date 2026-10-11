@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Database\Factories\BeritaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Berita extends Model
 {
@@ -13,17 +12,42 @@ class Berita extends Model
 
     protected $table = 'berita';
 
+    protected $primaryKey = 'id_berita';
+
     protected $fillable = [
         'judul',
+        'slug',
         'isi',
-        'tanggal',
         'gambar',
-        'id_user',
+        'tanggal',
     ];
 
-    public function user(): BelongsTo
+    protected static function boot()
     {
-        return $this->belongsTo(User::class, 'id_user', 'id');
+        parent::boot();
+
+        static::saving(function ($berita) {
+            // Hanya buat slug jika kosong atau judulnya berubah
+            if (empty($berita->slug) || $berita->isDirty('judul')) {
+                $slug = Str::slug($berita->judul);
+                $originalSlug = $slug;
+                $count = 1;
+
+                // Cek apakah slug sudah ada di database (selain record ini sendiri)
+                while (static::where('slug', $slug)
+                    ->where('id_berita', '!=', $berita->id_berita ?? 0)
+                    ->exists()) {
+                    $slug = "{$originalSlug}-{$count}";
+                    $count++;
+                }
+
+                $berita->slug = $slug;
+            }
+        });
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); // Sesuaikan foreign key jika namanya berbeda, misal 'id_user'
     }
 }
-

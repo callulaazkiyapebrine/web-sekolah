@@ -6,27 +6,40 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EkstrakurikulerController;
 use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\GuruController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ProfileSekolahController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// LANDING PAGE (PUBLIK)
-Route::get('/', [DashboardController::class, 'publicDashboard'])->name('public.dashboard');
+// Landing / Beranda
+// Route Beranda
+Route::get('/', [LandingController::class, 'index'])->name('beranda');
 
-// AUTENTIKASI
+Route::get('/profil', [LandingController::class, 'profil'])->name('public.profil');
+
+Route::get('/guru', [LandingController::class, 'guru'])->name('public.guru');
+Route::get('/guru/{id}', [LandingController::class, 'showGuru'])->name('guru.show');
+// Route Berita
+Route::get('/berita', [LandingController::class, 'berita'])->name('berita');
+Route::get('/berita/{slug}', [LandingController::class, 'showBerita'])->name('berita.show');
+
+// Route Ekstrakurikuler (Daftar & Detail)
+Route::get('/ekstrakurikuler', [LandingController::class, 'ekstrakurikuler'])->name('ekstrakurikuler');
+Route::get('/ekstrakurikuler/{slug}', [LandingController::class, 'showEkstrakurikuler'])->name('ekstrakurikuler.show');
+
+Route::get('/galeri', [LandingController::class, 'galeri'])->name('galeri');
+Route::get('/galeri/{id}', [LandingController::class, 'showGaleri'])->name('galeri.show');
+
+// 2. AUTENTIKASI
 Route::middleware('guest')->group(function () {
-    Route::get('/admin/login', [AuthController::class, 'index'])->name('admin.login');
-    Route::post('/login-proses', [AuthController::class, 'processLogin'])->name('admin.login.proses');
     Route::get('/login', [AuthController::class, 'index'])->name('login');
+    Route::post('/login', [AuthController::class, 'processLogin'])->name('login.proses');
 });
 
-// LOGOUT
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
-// ============================================================
-// AREA PANEL ADMIN (MIDDLEWARE AUTH DIMATIKAN SEMENTARA)
-// ============================================================
+// 3. PANEL ADMIN (BISA DIAKSES LANGSUNG TANPA LOGIN)
 Route::prefix('admin')->group(function () {
 
     // DASHBOARD ADMIN
@@ -34,6 +47,7 @@ Route::prefix('admin')->group(function () {
 
     // PROFIL SEKOLAH
     Route::get('/profil-sekolah', [ProfileSekolahController::class, 'index'])->name('admin.profile-sekolah.index');
+    Route::get('/profil-sekolah/edit', [ProfileSekolahController::class, 'edit'])->name('admin.profile-sekolah.edit');
     Route::post('/profil-sekolah/save', [ProfileSekolahController::class, 'save'])->name('admin.profile-sekolah.save');
 
     // EKSTRAKURIKULER
@@ -59,10 +73,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [GuruController::class, 'index'])->name('admin.guru.index');
         Route::get('/add-edit/{id?}', [GuruController::class, 'addEdit'])->name('admin.guru.addEdit');
         Route::post('/save/{id?}', [GuruController::class, 'save'])->name('admin.guru.save');
-        Route::get('/{id}', [GuruController::class, 'show'])->name('admin.guru.show');
+
+        // 1. Rute /show/{id} HARUS ditaruh di ATAS rute wildcard /{id}
+        Route::get('/show/{id}', [GuruController::class, 'show'])->name('admin.guru.show');
+
+        // 2. Rute wildcard /{id} (DELETE) ditaruh di PALING BAWAH
         Route::delete('/{id}', [GuruController::class, 'destroy'])->name('admin.guru.destroy');
     });
-
     // GALERI
     Route::prefix('galeri')->group(function () {
         Route::get('/', [GaleriController::class, 'index'])->name('admin.galeri.index');
@@ -72,6 +89,7 @@ Route::prefix('admin')->group(function () {
         Route::delete('/{id}', [GaleriController::class, 'destroy'])->name('admin.galeri.delete');
     });
 
+    // BERITA
     // BERITA
     Route::prefix('berita')->group(function () {
         Route::get('/', [BeritaController::class, 'index'])->name('admin.berita.index');

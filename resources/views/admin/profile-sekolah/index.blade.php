@@ -1,222 +1,132 @@
-@extends('admin_app')
-
-@section('title', $title ?? 'Profile Sekolah')
-@section('breadcrumb', 'Profile Sekolah')
+@extends('admin_app') {{-- Sesuaikan nama layout admin kamu --}}
 
 @section('content')
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="space-y-6">
+    <!-- Header Page -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold text-gray-800">Profil Sekolah</h1>
+        </div>
+        <a href="{{ route('admin.profile-sekolah.edit') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-2">
+            <i class="fas fa-edit"></i> Edit Profil
+        </a>
+    </div>
 
-        <!-- KARTU 1: IDENTITAS SEKOLAH (PREVIEW) -->
-        <div class="lg:col-span-1">
-            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border h-full">
-                <div class="p-6 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                    <h6 class="mb-0 font-bold text-sky-950 flex items-center gap-2">
-                        <i class="fas fa-info-circle text-sky-600"></i> Identitas Sekolah
-                    </h6>
+    <!-- Main Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
+        <h2 class="text-base font-bold text-gray-800 border-b pb-3">Informasi Sekolah</h2>
+
+        <!-- Logo, Foto Gedung & Foto Kepala Sekolah -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Logo -->
+            <div class="text-center">
+                <p class="text-sm font-semibold text-gray-500 mb-3">Logo Sekolah</p>
+                <div class="flex items-center justify-center h-48 bg-gray-50 rounded-lg p-4 border border-gray-100">
+                    @php $logo = data_get($profil, 'logo'); @endphp
+                    @if ($logo && file_exists(public_path('storage/' . $logo)))
+                        <img src="{{ asset('storage/' . $logo) }}" alt="Logo Sekolah" class="max-h-36 object-contain">
+                    @else
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png" alt="Logo Default" class="max-h-36 object-contain">
+                    @endif
                 </div>
-                <div class="flex-auto p-6 text-center">
-                    <!-- LOGO SEKOLAH -->
-                    <div class="mb-4">
-                        @if (isset($profil->logo) && file_exists(public_path('storage/' . $profil->logo)))
-                            <img src="{{ asset('storage/' . $profil->logo) }}" alt="Logo Sekolah"
-                                class="w-28 h-28 object-contain mx-auto drop-shadow-md">
-                        @else
-                            <img src="https://raw.githubusercontent.com/PKM-KC-2021/Assets/main/Tutwuri.png"
-                                alt="Logo Tut Wuri Handayani" class="w-28 h-28 object-contain mx-auto drop-shadow-md"
-                                onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png';">
-                        @endif
-                    </div>
+            </div>
 
-                    <h5 class="font-bold text-slate-800 text-lg mb-1">
-                        {{ $profil->nama_sekolah ?? 'SMK YPC TASIKMALAYA' }}
-                    </h5>
-                    <p class="text-xs text-slate-400 mb-6">
-                        <i class="fas fa-user-tie text-sky-500 mr-1"></i>
-                        {{ $profil->nama_kepala_sekolah ?? '-' }}
-                    </p>
+            <!-- Foto Gedung -->
+            <div class="text-center">
+                <p class="text-sm font-semibold text-gray-500 mb-3">Foto Sekolah / Gedung</p>
+                <div class="flex items-center justify-center h-48 bg-gray-50 rounded-lg p-2 border border-gray-100 overflow-hidden">
+                    @php $foto = data_get($profil, 'foto_gedung') ?? data_get($profil, 'foto') ?? data_get($profil, 'gambar'); @endphp
+                    @if ($foto && file_exists(public_path('storage/' . $foto)))
+                        <img src="{{ asset('storage/' . $foto) }}" alt="Foto Gedung" class="w-full h-full object-cover rounded-md">
+                    @else
+                        <img src="{{ asset('storage/sd.jpg') }}" alt="Gedung Sekolah" class="w-full h-full object-cover rounded-md">
+                    @endif
+                </div>
+            </div>
 
-                    <!-- DETAIL RINCIAN -->
-                    <div class="border-t border-gray-100 pt-4 text-left space-y-3 text-sm">
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 font-medium flex items-center gap-2">
-                                <i class="fas fa-th-large text-xs text-sky-600"></i> NPSN:
-                            </span>
-                            <span class="font-semibold text-slate-700">{{ $profil->npsn ?? '-' }}</span>
+            {{-- <!-- Foto Kepala Sekolah -->
+            <div class="text-center">
+                <p class="text-sm font-semibold text-gray-500 mb-3">Foto Kepala Sekolah</p>
+                <div class="flex items-center justify-center h-48 bg-gray-50 rounded-lg p-2 border border-gray-100 overflow-hidden">
+                    @php $fotoKasek = data_get($profil, 'foto_kepala_sekolah'); @endphp
+                    @if ($fotoKasek && file_exists(public_path('storage/' . $fotoKasek)))
+                        <img src="{{ asset('storage/' . $fotoKasek) }}" alt="Kepala Sekolah" class="w-full h-full object-cover rounded-md">
+                    @else
+                        <div class="flex flex-col items-center justify-center text-gray-400">
+                            <i class="fas fa-user-tie text-4xl mb-2"></i>
+                            <span class="text-xs">Belum ada foto</span>
                         </div>
+                    @endif
+                </div>
+            </div> --}}
+        </div>
 
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 font-medium flex items-center gap-2">
-                                <i class="fas fa-calendar-alt text-xs text-sky-600"></i> Tahun Berdiri:
-                            </span>
-                            <span class="font-semibold text-slate-700">{{ $profil->tahun_berdiri ?? '-' }}</span>
-                        </div>
+        <hr class="border-gray-100">
 
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 font-medium flex items-center gap-2">
-                                <i class="fas fa-phone text-xs text-sky-600"></i> Kontak:
-                            </span>
-                            <span class="font-semibold text-slate-700">{{ $profil->no_telepon ?? '-' }}</span>
-                        </div>
-                    </div>
+        <!-- Detail Identitas Sekolah -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-sm">
+            <div class="space-y-2">
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                    <span class="text-gray-500 w-1/3">Nama Sekolah</span>
+                    <span class="text-gray-400 w-1/12 text-center">:</span>
+                    <span class="font-semibold text-gray-800 w-7/12">{{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                    <span class="text-gray-500 w-1/3">Kepala Sekolah</span>
+                    <span class="text-gray-400 w-1/12 text-center">:</span>
+                    <span class="font-medium text-gray-800 w-7/12">{{ data_get($profil, 'nama_kepala_sekolah', '-') }}</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                    <span class="text-gray-500 w-1/3">NPSN</span>
+                    <span class="text-gray-400 w-1/12 text-center">:</span>
+                    <span class="font-medium text-gray-800 w-7/12">{{ data_get($profil, 'npsn', '-') }}</span>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                    <span class="text-gray-500 w-1/3">Tahun Berdiri</span>
+                    <span class="text-gray-400 w-1/12 text-center">:</span>
+                    <span class="font-medium text-gray-800 w-7/12">{{ data_get($profil, 'tahun_berdiri', '-') }}</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                    <span class="text-gray-500 w-1/3">Kontak</span>
+                    <span class="text-gray-400 w-1/12 text-center">:</span>
+                    <span class="font-medium text-gray-800 w-7/12">{{ data_get($profil, 'no_telepon') ?? data_get($profil, 'telepon') ?? '-' }}</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-gray-50">
+                    <span class="text-gray-500 w-1/3">Alamat</span>
+                    <span class="text-gray-400 w-1/12 text-center">:</span>
+                    <span class="font-medium text-gray-800 w-7/12">{{ data_get($profil, 'alamat', '-') }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- KARTU 2: FORM EDIT / UPDATE PROFILE SEKOLAH -->
-        <div class="lg:col-span-2">
-            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-                <div class="p-6 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                    <h6 class="mb-0 font-bold text-sky-950 flex items-center gap-2">
-                        <i class="fas fa-edit text-sky-600"></i> Edit Profile Sekolah
-                    </h6>
-                    <p class="text-xs text-slate-400 mb-0">Ubah dan perbarui data profil sekolah di bawah ini</p>
+        <hr class="border-gray-100">
+
+        <!-- DESKRIPSI & VISI MISI -->
+        <div class="space-y-6 pt-2">
+            <!-- Deskripsi -->
+            <div>
+                <h3 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-blue-600"></i> Deskripsi Sekolah
+                </h3>
+                <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-600 leading-relaxed border border-gray-100">
+                    {!! nl2br(e(data_get($profil, 'deskripsi') ?? data_get($profil, 'sejarah') ?? 'Deskripsi sekolah belum diisi.')) !!}
                 </div>
+            </div>
 
-                <div class="flex-auto p-6">
-
-                    <!-- NOTIFIKASI SUKSES -->
-                    @if (session('success'))
-                        <div class="mb-4 p-4 bg-emerald-100 border border-emerald-400 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
-                            <i class="fas fa-check-circle text-emerald-600 text-base"></i>
-                            <span>{{ session('success') }}</span>
-                        </div>
-                    @endif
-
-                    <!-- NOTIFIKASI ERROR VALIDASI -->
-                    @if ($errors->any())
-                        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-800 rounded-xl text-xs">
-                            <p class="font-bold mb-1">Terjadi kesalahan input:</p>
-                            <ul class="list-disc pl-5 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('admin.profile-sekolah.save') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <!-- NAMA SEKOLAH -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    Nama Sekolah <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="nama_sekolah"
-                                    value="{{ old('nama_sekolah', $profil->nama_sekolah ?? '') }}"
-                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                    required>
-                            </div>
-
-                            <!-- NAMA KEPALA SEKOLAH -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    Nama Kepala Sekolah <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="nama_kepala_sekolah"
-                                    value="{{ old('nama_kepala_sekolah', $profil->nama_kepala_sekolah ?? '') }}"
-                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                    required>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <!-- NPSN -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    NPSN <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="npsn"
-                                    value="{{ old('npsn', $profil->npsn ?? '') }}"
-                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                    required>
-                            </div>
-
-                            <!-- TAHUN BERDIRI -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    Tahun Berdiri <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" name="tahun_berdiri"
-                                    value="{{ old('tahun_berdiri', $profil->tahun_berdiri ?? '') }}"
-                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                    required>
-                            </div>
-
-                            <!-- NO KONTAK / TELEPON -->
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    No. Kontak / Telepon <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="no_telepon"
-                                    value="{{ old('no_telepon', $profil->no_telepon ?? '') }}"
-                                    class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                    required>
-                            </div>
-                        </div>
-
-                        <!-- ALAMAT LENGKAP -->
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                Alamat Lengkap <span class="text-red-500">*</span>
-                            </label>
-                            <textarea name="alamat" rows="2"
-                                class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                required>{{ old('alamat', $profil->alamat ?? '') }}</textarea>
-                        </div>
-
-                        <!-- VISI & MISI -->
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                Visi & Misi Sekolah <span class="text-red-500">*</span>
-                            </label>
-                            <textarea name="visi_misi" rows="3"
-                                class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                required>{{ old('visi_misi', $profil->visi_misi ?? '') }}</textarea>
-                        </div>
-
-                        <!-- DESKRIPSI / SAMBUTAN -->
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                Deskripsi / Sambutan Sekolah
-                            </label>
-                            <textarea name="deskripsi" rows="3"
-                                class="w-full text-sm rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500">{{ old('deskripsi', $profil->deskripsi ?? '') }}</textarea>
-                        </div>
-
-                        <!-- UPLOAD FILE LOGO & FOTO GEDUNG -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    Ganti Logo Sekolah
-                                </label>
-                                <input type="file" name="logo"
-                                    class="w-full text-xs rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
-                                <p class="text-[10px] text-slate-400 mt-1">Biarkan kosong jika tidak diubah. Format JPG/PNG (Maks: 2MB).</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">
-                                    Ganti Foto Gedung Sekolah
-                                </label>
-                                <input type="file" name="foto_gedung"
-                                    class="w-full text-xs rounded-xl border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
-                                <p class="text-[10px] text-slate-400 mt-1">Biarkan kosong jika tidak diubah. Format JPG/PNG (Maks: 2MB).</p>
-                            </div>
-                        </div>
-
-                        <!-- TOMBOL SUBMIT -->
-                        <div class="text-right">
-                            <button type="submit"
-                                class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-md transition-all cursor-pointer">
-                                <i class="fas fa-save text-xs"></i> SIMPAN PERUBAHAN
-                            </button>
-                        </div>
-                    </form>
+            <!-- Visi & Misi Menjadi Satu Kotak / Textarea Tunggal -->
+            <div>
+                <h3 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <i class="fas fa-bullseye text-blue-600"></i> Visi & Misi Sekolah
+                </h3>
+                <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-600 leading-relaxed border border-gray-100">
+                    {!! nl2br(e(data_get($profil, 'visi_misi') ?? data_get($profil, 'visi') ?? 'Visi & Misi sekolah belum diisi.')) !!}
                 </div>
             </div>
         </div>
 
     </div>
+</div>
 @endsection

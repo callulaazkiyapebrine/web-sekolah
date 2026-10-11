@@ -25,7 +25,7 @@
     <!-- GRID KARTU SEKOLAH & STATISTIK -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
-        <!-- KARTU ID SEKOLAH (DENGAN LOGO TUT WURI HANDAYANI) -->
+        <!-- KARTU ID SEKOLAH (DENGAN LOGO DINAMIS) -->
         <div class="lg:col-span-1">
             <div
                 class="relative flex flex-col items-center justify-center p-6 bg-gradient-to-b from-sky-800 to-sky-950 text-white rounded-2xl shadow-soft-xl h-full min-h-[230px] border border-sky-700">
@@ -33,23 +33,25 @@
                 <!-- BADGE NPSN -->
                 <div
                     class="absolute top-4 left-4 bg-sky-900/90 text-amber-300 text-xs px-3 py-1 rounded-full border border-amber-400/30 font-medium">
-                    NPSN: {{ $profilSekolah->npsn ?? '-' }}
+                    NPSN: {{ data_get($profil, 'npsn', '-') }}
                 </div>
 
                 <div class="text-center mt-6">
-                    <!-- LOGO TUT WURI HANDAYANI / LOGO CUSTOM -->
-                    @if (isset($profilSekolah->logo) && file_exists(public_path('storage/' . $profilSekolah->logo)))
-                        <img src="{{ asset('storage/' . $profilSekolah->logo) }}" alt="Logo Sekolah"
+                    <!-- LOGO SEKOLAH -->
+                    @php
+                        $logoPath = data_get($profil, 'logo');
+                    @endphp
+                    @if ($logoPath && file_exists(public_path('storage/' . $logoPath)))
+                        <img src="{{ asset('storage/' . $logoPath) }}" alt="Logo Sekolah"
                             class="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md">
                     @else
-                        <img src="https://raw.githubusercontent.com/PKM-KC-2021/Assets/main/Tutwuri.png"
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png"
                             alt="Logo Tut Wuri Handayani"
-                            class="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md"
-                            onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Logo_Tut_Wuri_Handayani.png/240px-Logo_Tut_Wuri_Handayani.png';">
+                            class="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md">
                     @endif
 
                     <h5 class="text-white font-bold text-lg mb-0 tracking-wide">
-                        {{ $profilSekolah->nama_sekolah ?? 'SMK YPC TASIKMALAYA' }}
+                        {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}
                     </h5>
                     <p class="text-sky-200/80 text-xs mt-1 font-medium">Panel Administrator Sistem</p>
                 </div>
@@ -65,7 +67,7 @@
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">TOTAL SISWA</p>
                     <h3 class="text-2xl font-bold text-sky-900 mb-1">
-                        {{ $totalSiswa }}
+                        {{ $totalSiswa ?? 0 }}
                     </h3>
                     <span class="text-xs text-sky-600 font-medium">Siswa Terdaftar</span>
                 </div>
@@ -80,7 +82,7 @@
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">TOTAL GURU</p>
                     <h3 class="text-2xl font-bold text-sky-900 mb-1">
-                        {{ $totalGuru }}
+                        {{ $totalGuru ?? 0 }}
                     </h3>
                     <span class="text-xs text-sky-600 font-medium">Tenaga Pendidik</span>
                 </div>
@@ -95,7 +97,7 @@
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">EKSTRAKURIKULER</p>
                     <h3 class="text-2xl font-bold text-amber-900 mb-1">
-                        {{ $totalEkstrakurikuler }}
+                        {{ $totalEkstrakurikuler ?? 0 }}
                     </h3>
                     <span class="text-xs text-amber-600 font-medium">Kegiatan Aktif</span>
                 </div>
@@ -110,7 +112,7 @@
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">TOTAL BERITA</p>
                     <h3 class="text-2xl font-bold text-amber-900 mb-1">
-                        {{ $totalBerita }}
+                        {{ $totalBerita ?? 0 }}
                     </h3>
                     <span class="text-xs text-amber-600 font-medium">Artikel Publikasi</span>
                 </div>
@@ -148,7 +150,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($beritaTerbaru as $item)
+                    @forelse($beritaTerbaru ?? [] as $item)
                         <tr class="border-b hover:bg-sky-50/30">
                             <td class="py-3.5 px-4 font-semibold text-slate-700">
                                 {{ $item->judul ?? '-' }}
