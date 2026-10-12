@@ -66,7 +66,7 @@ class LandingController extends Controller
             $guru = Guru::where('id_guru', $id)->first();
         }
 
-        if (! $guru) {
+        if (!$guru) {
             return redirect()->route('public.guru')->with('error', 'Data guru tidak ditemukan.');
         }
 
@@ -138,7 +138,7 @@ class LandingController extends Controller
             $galeri = Galeri::where('id_galeri', $id)->first();
         }
 
-        if (! $galeri) {
+        if (!$galeri) {
             return redirect()->route('galeri')->with('error', 'Data galeri tidak ditemukan.');
         }
 
@@ -150,8 +150,41 @@ class LandingController extends Controller
     public function dataProfile()
     {
         $profil = ProfileSekolah::first();
-        $dataProfile = DataProfile ::all();
 
-        return view('public.data-profile');
+        // Masukkan data Anda di sini
+        $student = (object) [
+            'nama' => 'Febriani Sepira',
+            'nisn' => '0085512455',
+            'kelas' => 'XI RPL II',
+            'deskripsi' => 'Halo! Saya Febriani Sepira, pengembang perangkat lunak yang merancang dan membangun sistem website resmi sekolah ini. Menggunakan teknologi modern seperti Laravel dan Tailwind CSS, saya berdedikasi untuk menciptakan platform digital yang cepat, responsif, aman, dan mudah digunakan bagi seluruh warga sekolah.',
+            'foto' => 'febriani.png.jpeg', // Opsional
+        ];
+
+        return view('public.data-profile', compact('profil', 'student'));
+    }
+
+    /**
+     * Menampilkan detail siswa untuk halaman publik.
+     */
+    public function showSiswa($id)
+    {
+        try {
+            // Dekripsi ID dari URL
+            $resolvedId = Crypt::decrypt($id);
+        } catch (\Exception $e) {
+            $resolvedId = $id;
+        }
+
+        // Ambil data profil sekolah untuk header/footer
+        $profil = ProfileSekolah::first(); 
+
+        // Cari data siswa berdasarkan ID
+        $siswa = Siswa::where('id', $resolvedId)->first();
+
+        if (!$siswa) {
+            return redirect()->route('public.siswa')->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        return view('public.siswa-detail', compact('siswa', 'profil'));
     }
 }

@@ -50,7 +50,8 @@
                 <nav class="hidden md:flex items-center space-x-6 text-xs font-semibold text-gray-700">
                     <a href="{{ route('beranda') }}" class="hover:text-sky-600 transition">Beranda</a>
                     <a href="{{ url('/profil') }}" class="hover:text-sky-600 transition">Profil</a>
-                    <a href="{{ route('public.guru') }}" class="text-sky-600 font-bold transition">Guru</a>
+                    <a href="{{ route('public.guru') }}" class="hover:text-sky-600 transition">Guru</a>
+                    <!-- Menu Siswa diset aktif (biru), Guru dikembalikan ke warna normal -->
                     <a href="{{ route('public.siswa') }}" class="text-sky-600 font-bold transition">Siswa</a>
                     <a href="{{ route('berita') }}" class="hover:text-sky-600 transition">Berita</a>
                     <a href="{{ route('ekstrakurikuler') }}" class="hover:text-sky-600 transition">Ekstrakurikuler</a>
@@ -72,7 +73,7 @@
             <a href="{{ url('/profil') }}" @click="open = false"
                 class="block py-1 text-gray-700 hover:text-sky-600">Profil</a>
             <a href="{{ route('public.guru') }}" @click="open = false"
-                class="block py-1 text-sky-600 font-bold">Guru</a>
+                class="block py-1 text-gray-700 hover:text-sky-600">Guru</a>
             <a href="{{ route('public.siswa') }}" @click="open = false"
                 class="block py-1 text-sky-600 font-bold">Siswa</a>
             <a href="{{ route('berita') }}" @click="open = false"
@@ -90,7 +91,7 @@
         <!-- JUDUL HALAMAN -->
         <div class="mb-10 text-center md:text-left border-b border-gray-200 pb-5">
             <h1 class="text-2xl md:text-3xl font-extrabold text-sky-950 mb-2">Daftar Siswa</h1>
-            <p class="text-xs text-gray-500">Siswa/Siswa SDN Pasirsalam
+            <p class="text-xs text-gray-500">Siswa/Siswi SDN Pasirsalam
                 {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}</p>
         </div>
 
@@ -98,7 +99,6 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
             @forelse($siswa as $item)
                 @php
-                    // Mengambil ID secara dinamis (id_siswa atau id) lalu di-encrypt
                     $rawId = $item->id_siswa ?? ($item->id ?? null);
                     $encryptedId = $rawId ? Crypt::encrypt($rawId) : '';
                 @endphp
@@ -123,13 +123,18 @@
                             {{ $item->nama_siswa }}
                         </h3>
 
-                        <span class="text-xs font-semibold text-sky-600 uppercase tracking-wider mb-4 block">
-                            {{ $item->nisn ?? ($item->nisn ?? 'Pelajar') }}
+                        <span class="text-xs font-semibold text-sky-600 uppercase tracking-wider mb-2 block">
+                            Kelas: {{ $item->kelas ?? '-' }}
+                        </span>
+
+                        <span class="text-xs text-gray-500 mb-4 block">
+                            NISN: {{ $item->nisn ?? '-' }}
                         </span>
                     </div>
 
-                    <!-- TOMBOL LIHAT DETAIL DENGAN ENKRIPSI ID -->
-                    <a href="{{ route('guru.show', $encryptedId) }}"
+                    <!-- TOMBOL LIHAT DETAIL SISWA (Diubah rutenya ke siswa, misal: public.siswa.show jika ada) -->
+                    <!-- Jika rute detail publik siswa belum ada, Anda bisa menyesuaikan namanya -->
+                    <a href="{{ route('siswa.show', $encryptedId) }}"
                         class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-white bg-sky-50 hover:bg-sky-600 px-4 py-2.5 rounded-xl transition-all w-full justify-center text-center shadow-sm">
                         Lihat Detail <i class="fas fa-arrow-right text-[10px]"></i>
                     </a>
@@ -146,10 +151,7 @@
     <footer class="bg-sky-600 text-white text-xs py-12 border-t border-sky-500">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <!-- Grid 3 Kolom -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8 pb-8 border-b border-sky-500/50">
-
-                <!-- Kolom 1: Profil / Deskripsi Sekolah (Lebar 6) -->
                 <div class="md:col-span-6 space-y-3">
                     <h3 class="font-bold text-sm tracking-wider uppercase">
                         {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}
@@ -159,23 +161,19 @@
                     </p>
                 </div>
 
-                <!-- Kolom 2: Menu Navigasi (Lebar 3) -->
                 <div class="md:col-span-3 space-y-3">
                     <h3 class="font-bold text-sm tracking-wider uppercase">Menu</h3>
                     <ul class="space-y-2 text-sky-100 text-[11px]">
                         <li><a href="{{ route('beranda') }}" class="hover:text-white transition">Beranda</a></li>
-                        <li><a href="{{ url('/profil') }}" class="hover:text-white transition">Profile Sekolah</a>
-                        </li>
-                        <li><a href="{{ route('public.guru') }}" class="hover:text-white transition">Staf & Guru</a>
-                        </li>
+                        <li><a href="{{ url('/profil') }}" class="hover:text-white transition">Profile Sekolah</a></li>
+                        <li><a href="{{ route('public.guru') }}" class="hover:text-white transition">Staf & Guru</a></li>
+                        <li><a href="{{ route('public.siswa') }}" class="hover:text-white transition">Siswa</a></li>
                         <li><a href="{{ route('berita') }}" class="hover:text-white transition">Berita</a></li>
                         <li><a href="{{ route('galeri') }}" class="hover:text-white transition">Galeri</a></li>
-                        <li><a href="{{ route('ekstrakurikuler') }}"
-                                class="hover:text-white transition">Ekstrakurikuler</a></li>
+                        <li><a href="{{ route('ekstrakurikuler') }}" class="hover:text-white transition">Ekstrakurikuler</a></li>
                     </ul>
                 </div>
 
-                <!-- Kolom 3: Kontak (Lebar 3) -->
                 <div class="md:col-span-3 space-y-3">
                     <h3 class="font-bold text-sm tracking-wider uppercase">Kontak</h3>
                     <div class="space-y-2 text-sky-100 text-[11px] leading-relaxed">
@@ -189,13 +187,10 @@
                         </p>
                     </div>
                 </div>
-
             </div>
 
-            <!-- Copyright Bawah -->
             <div class="text-center text-sky-100 text-[11px]">
-                <p>&copy; {{ date('Y') }} {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}. Seluruh Hak
-                    Cipta Dilindungi.</p>
+                <p>&copy; {{ date('Y') }} {{ data_get($profil, 'nama_sekolah', 'SDN PASIRSALAM') }}. Seluruh Hak Cipta Dilindungi.</p>
             </div>
 
         </div>

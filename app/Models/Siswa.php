@@ -9,14 +9,15 @@ class Siswa extends Model
 {
     use HasFactory;
 
-    // Menentukan nama tabel yang benar di database
     protected $table = 'siswa';
-
-    protected $primaryKey = 'id_siswa';
+    
+    // Tambahkan baris ini agar Eloquent tahu primary key-nya adalah 'id'
+    protected $primaryKey = 'id'; 
 
     protected $fillable = [
         'nisn',
         'nama_siswa',
+        'kelas',
         'jenis_kelamin',
         'tahun_masuk',
     ];

@@ -23,6 +23,8 @@ Route::get('/guru/{id}', [LandingController::class, 'showGuru'])->name('guru.sho
 
 //siswa
 Route::get('/siswa', [LandingController::class, 'siswa'])->name('public.siswa');
+Route::get('/siswa/{id}', [LandingController::class, 'showSiswa'])->name('siswa.show');
+
 // Route Berita
 Route::get('/berita', [LandingController::class, 'berita'])->name('berita');
 Route::get('/berita/{slug}', [LandingController::class, 'showBerita'])->name('berita.show');
@@ -67,8 +69,10 @@ Route::prefix('admin')->group(function () {
     // SISWA
     Route::prefix('siswa')->group(function () {
         Route::get('/', [SiswaController::class, 'index'])->name('admin.siswa.index');
-        Route::get('/add-edit/{id?}', [SiswaController::class, 'addEdit'])->name('admin.siswa.addEdit');
-        Route::post('/save/{id?}', [SiswaController::class, 'save'])->name('admin.siswa.save');
+        Route::get('/addEdit/{id?}', [SiswaController::class, 'addEdit'])->name('admin.siswa.addEdit');
+        // Pastikan metodenya POST
+        Route::post('/admin/siswa/simpan/{id?}', [SiswaController::class, 'save'])->name('admin.siswa.save');
+        Route::match(['get', 'post'], '/admin/siswa/simpan/{id?}', [SiswaController::class, 'save'])->name('admin.siswa.save');
         Route::get('/{id}', [SiswaController::class, 'show'])->name('admin.siswa.show');
         Route::delete('/{id}', [SiswaController::class, 'destroy'])->name('admin.siswa.delete');
     });

@@ -1,6 +1,6 @@
 @extends('admin_app')
 
-@section('title', isset($siswa) ? 'Edit Data Siswa' : 'Tambah Data Siswa')
+@section('title', isset($siswa) && $siswa->id ? 'Edit Data Siswa' : 'Tambah Data Siswa')
 
 @section('content')
 <div style="padding: 15px 20px;">
@@ -10,10 +10,10 @@
         {{-- HEADER --}}
         <div style="margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #e9ecef;">
             <h4 style="font-weight: 700; color: #212529; margin: 0 0 4px 0; font-size: 18px;">
-                {{ isset($siswa) ? 'Edit Data Siswa' : 'Tambah Data Siswa' }}
+                {{ isset($siswa) && $siswa->id ? 'Edit Data Siswa' : 'Tambah Data Siswa' }}
             </h4>
             <p style="color: #6c757d; font-size: 13px; margin: 0;">
-                {{ isset($siswa) ? 'Silakan perbarui data siswa di bawah ini.' : 'Silakan isi formulir untuk menambahkan data siswa baru.' }}
+                {{ isset($siswa) && $siswa->id ? 'Silakan perbarui data siswa di bawah ini.' : 'Silakan isi formulir untuk menambahkan data siswa baru.' }}
             </p>
         </div>
 
@@ -29,7 +29,7 @@
         @endif
 
         {{-- FORM UTAMA --}}
-        <form action="{{ route('admin.siswa.save', isset($siswa) ? Crypt::encrypt($siswa->id_siswa ?? $siswa->id) : '') }}"
+        <form action="{{ isset($siswa) && $siswa->id ? route('admin.siswa.save', Crypt::encrypt($siswa->id_siswa ?? $siswa->id)) : route('admin.siswa.save') }}"
               method="POST">
             @csrf
 
@@ -49,6 +49,23 @@
                 </label>
                 <input type="text" name="nama_siswa" value="{{ old('nama_siswa', $siswa->nama_siswa ?? $siswa->nama ?? '') }}" required placeholder="Contoh: Anisa Nazwa"
                        style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">
+            </div>
+
+            {{-- KELAS (DROPDOWN KELAS 1 SAMPAI 6) --}}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
+                    Kelas <span style="color: red;">*</span>
+                </label>
+                <select name="kelas" required style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none; background-color: #fff;">
+                    <option value="" disabled {{ old('kelas', $siswa->kelas ?? '') == '' ? 'selected' : '' }}>-- Pilih Kelas --</option>
+                    @for ($i = 1; $i <= 6; $i++)
+                        {{-- Jika Anda ingin menyimpannya sebagai angka (1, 2, 3...) ganti $valKelas menjadi $i --}}
+                        @php $valKelas = 'Kelas ' . $i; @endphp
+                        <option value="{{ $valKelas }}" {{ old('kelas', $siswa->kelas ?? '') == $valKelas ? 'selected' : '' }}>
+                            {{ $valKelas }}
+                        </option>
+                    @endfor
+                </select>
             </div>
 
             {{-- JENIS KELAMIN --}}
@@ -80,7 +97,7 @@
                 </a>
                 <button type="submit"
                         style="background-color: #0d6efd; color: #ffffff; border: none; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; box-shadow: 0 2px 4px rgba(13,110,253,0.2);">
-                    {{ isset($siswa) ? 'Update Data' : 'Simpan Data' }}
+                    {{ isset($siswa) && $siswa->id ? 'Update Data' : 'Simpan Data' }}
                 </button>
             </div>
         </form>

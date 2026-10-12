@@ -49,6 +49,7 @@
                         <th class="text-center" style="width: 50px;">NO</th>
                         <th>NISN</th>
                         <th>NAMA SISWA</th>
+                        <th>KELAS</th>
                         <th>JENIS KELAMIN</th>
                         <th>TAHUN MASUK</th>
                         <th class="text-center" style="width: 150px;">AKSI</th>
@@ -60,6 +61,7 @@
                         @php
                             $namaSiswa = $item->nama_siswa ?? $item->nama ?? $item->name ?? '-';
                             $nisn = $item->nisn ?? $item->nis ?? $item->nis_nisn ?? '-';
+                            $kelas = $item->kelas ?? '-';
                             $jk = $item->jenis_kelamin ?? $item->jk ?? '-';
                             $tahunMasuk = $item->tahun_masuk ?? $item->angkatan ?? '-';
                             $siswaId = $item->id_siswa ?? $item->id;
@@ -78,6 +80,9 @@
                                 </div>
                             </td>
 
+                            {{-- KELAS --}}
+                            <td style="font-size: 14px; color: #495057;">{{ $kelas }}</td>
+
                             {{-- JENIS KELAMIN --}}
                             <td style="font-size: 14px; color: #495057;">{{ $jk }}</td>
 
@@ -88,21 +93,21 @@
                             <td class="text-center">
                                 @if(auth()->check() && strtolower(auth()->user()->role) === 'admin')
                                     <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                        {{-- DETAIL --}}
+                                        {{-- DETAIL (Menggunakan Crypt::encrypt agar cocok dengan Controller) --}}
                                         <a href="{{ route('admin.siswa.show', Crypt::encrypt($siswaId)) }}"
                                            style="display: inline-block; background-color: #17a2b8; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
                                            title="Detail">
                                             Detail
                                         </a>
 
-                                        {{-- EDIT --}}
+                                        {{-- EDIT (Menggunakan Crypt::encrypt agar cocok dengan Controller) --}}
                                         <a href="{{ route('admin.siswa.addEdit', Crypt::encrypt($siswaId)) }}"
                                            style="display: inline-block; background-color: #ffc107; color: #000000; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;"
                                            title="Edit">
                                             Edit
                                         </a>
 
-                                        {{-- HAPUS --}}
+                                        {{-- HAPUS (Menggunakan Crypt::encrypt agar cocok dengan Controller) --}}
                                         <form action="{{ route('admin.siswa.delete', Crypt::encrypt($siswaId)) }}"
                                               method="POST"
                                               style="display: inline-block; margin: 0; padding: 0;"
@@ -123,7 +128,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 Belum ada data siswa.
                             </td>
                         </tr>
@@ -140,7 +145,6 @@
 @push('scripts')
     <script>
         $(document).ready(function () {
-            // Auto-hide alert sukses setelah 3 detik
             const alertBox = document.getElementById('success-alert');
             if (alertBox) {
                 setTimeout(function () {
@@ -169,7 +173,7 @@
 
                 columnDefs: [
                     {
-                        targets: [0, 5],
+                        targets: [0, 6],
                         orderable: false,
                         searchable: false
                     }
