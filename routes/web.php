@@ -20,6 +20,9 @@ Route::get('/profil', [LandingController::class, 'profil'])->name('public.profil
 
 Route::get('/guru', [LandingController::class, 'guru'])->name('public.guru');
 Route::get('/guru/{id}', [LandingController::class, 'showGuru'])->name('guru.show');
+
+//siswa
+Route::get('/siswa', [LandingController::class, 'siswa'])->name('public.siswa');
 // Route Berita
 Route::get('/berita', [LandingController::class, 'berita'])->name('berita');
 Route::get('/berita/{slug}', [LandingController::class, 'showBerita'])->name('berita.show');
@@ -30,6 +33,8 @@ Route::get('/ekstrakurikuler/{slug}', [LandingController::class, 'showEkstrakuri
 
 Route::get('/galeri', [LandingController::class, 'galeri'])->name('galeri');
 Route::get('/galeri/{id}', [LandingController::class, 'showGaleri'])->name('galeri.show');
+
+Route::get('/dataProfile', [LandingController::class, 'dataProfile'])->name('public.data-profile');
 
 // 2. AUTENTIKASI
 Route::middleware('guest')->group(function () {

@@ -51,10 +51,13 @@
                     <a href="{{ route('beranda') }}" class="hover:text-sky-600 transition">Beranda</a>
                     <a href="{{ url('/profil') }}" class="hover:text-sky-600 transition">Profil</a>
                     <a href="{{ route('public.guru') }}" class="hover:text-sky-600 transition">Guru</a>
+                    <a href="{{ route('public.siswa') }}" class="text-sky-600 font-bold transition">Siswa</a>
                     <a href="{{ route('berita') }}" class="hover:text-sky-600 transition">Berita</a>
                     <a href="{{ route('ekstrakurikuler') }}"
                         class="text-sky-600 font-bold transition">Ekstrakurikuler</a>
                     <a href="{{ route('galeri') }}" class="hover:text-sky-600 transition">Galeri</a>
+                    <a href="{{ route('public.data-profile') }}" class="hover:text-sky-600 transition">Data Profile</a>
+
                 </nav>
 
                 <!-- Mobile Menu Button -->
@@ -74,6 +77,8 @@
                 class="block py-1 text-gray-700 hover:text-sky-600">Profil</a>
             <a href="{{ route('public.guru') }}" @click="open = false"
                 class="block py-1 text-gray-700 hover:text-sky-600">Guru</a>
+            <a href="{{ route('public.siswa') }}" @click="open = false"
+                class="block py-1 text-sky-600 font-bold">Siswa</a>
             <a href="{{ route('berita') }}" @click="open = false"
                 class="block py-1 text-gray-700 hover:text-sky-600">Berita</a>
             <a href="{{ route('ekstrakurikuler') }}" @click="open = false"

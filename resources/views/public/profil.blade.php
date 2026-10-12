@@ -51,9 +51,11 @@
                     <a href="{{ route('beranda') }}" class="hover:text-sky-600 transition">Beranda</a>
                     <a href="{{ url('/profil') }}" class="text-sky-600 font-bold transition">Profil</a>
                     <a href="{{ route('public.guru') }}" class="hover:text-sky-600 transition">Guru</a>
+                    <a href="{{ route('public.siswa') }}" class="text-sky-600 font-bold transition">Siswa</a>
                     <a href="{{ route('berita') }}" class="hover:text-sky-600 transition">Berita</a>
                     <a href="{{ route('ekstrakurikuler') }}" class="hover:text-sky-600 transition">Ekstrakurikuler</a>
                     <a href="{{ route('galeri') }}" class="hover:text-sky-600 transition">Galeri</a>
+                    <a href="{{ route('public.data-profile') }}" class="hover:text-sky-600 transition">Data Profile</a>
                 </nav>
 
                 <!-- Tombol Admin / Login -->
@@ -150,7 +152,7 @@
                 </div>
             </div>
 
-            <!-- IDENTITAS SINGKAT SEKOLAH -->
+           <!-- IDENTITAS SINGKAT SEKOLAH -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
                 <h3 class="font-bold text-gray-900 text-base mb-4 border-b pb-2">Informasi Identitas</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">

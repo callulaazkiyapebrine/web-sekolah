@@ -12,6 +12,8 @@ class Siswa extends Model
     // Menentukan nama tabel yang benar di database
     protected $table = 'siswa';
 
+    protected $primaryKey = 'id_siswa';
+
     protected $fillable = [
         'nisn',
         'nama_siswa',

@@ -14,7 +14,7 @@
 <body class="bg-slate-50 min-h-screen flex flex-col justify-between">
 
     <!-- NAVBAR ATAS -->
-    <header class="w-full pt-6 px-4">
+    <!-- <header class="w-full pt-6 px-4">
         <div class="max-w-5xl mx-auto bg-white/80 backdrop-blur-md shadow-sm rounded-2xl px-6 py-3 flex items-center justify-between border border-slate-100">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 bg-[#0284c7] text-white rounded-lg flex items-center justify-center font-bold text-sm shadow-sm">
@@ -26,7 +26,7 @@
                 <a href="{{ url('/') }}" class="hover:text-[#0284c7] transition-colors">Beranda Utama</a>
             </nav>
         </div>
-    </header>
+    </header> -->
 
     <!-- FORM LOGIN CENTERED -->
     <main class="flex-1 flex items-center justify-center p-4">

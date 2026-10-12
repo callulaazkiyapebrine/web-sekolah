@@ -8,6 +8,7 @@ use App\Models\Galeri;
 use App\Models\Guru;
 use App\Models\ProfileSekolah;
 use App\Models\Siswa;
+use App\Models\DataProfile;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
 
@@ -20,9 +21,12 @@ class LandingController extends Controller
         $totalGuru = Guru::count();
         $totalEsktrakurikuler = Ekstrakurikuler::count();
         $guru = Guru::all();
+        $siswa = Siswa::all();
         $berita = Berita::latest()->get();
         $ekstrakurikuler = Ekstrakurikuler::all();
         $galeri = Galeri::all();
+        $dataProfile = DataProfile::all();
+        // $dataProfile = dataProfile::first();
 
         return view('landing.index', compact(
             'profil',
@@ -70,6 +74,15 @@ class LandingController extends Controller
 
         return view('public.guru-detail', compact('guru', 'profil'));
     }
+
+    public function siswa()
+    {
+        $profil = ProfileSekolah::first();
+        $siswa = Siswa::all();
+
+        return view('public.siswa', compact('profil', 'siswa'));
+    }
+
 
     public function berita()
     {
@@ -132,5 +145,13 @@ class LandingController extends Controller
         $profil = ProfileSekolah::first();
 
         return view('public.galeri-detail', compact('galeri', 'profil'));
+    }
+
+    public function dataProfile()
+    {
+        $profil = ProfileSekolah::first();
+        $dataProfile = DataProfile ::all();
+
+        return view('public.data-profile');
     }
 }
