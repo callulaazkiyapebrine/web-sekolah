@@ -51,20 +51,18 @@
                        style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none;">
             </div>
 
-            {{-- KELAS (DROPDOWN KELAS 1 SAMPAI 6) --}}
+            {{-- KELAS (DINAMIS DARI TABEL KELAS DATABASE) --}}
             <div style="margin-bottom: 20px;">
                 <label style="display: block; font-weight: 600; color: #212529; font-size: 14px; margin-bottom: 8px;">
                     Kelas <span style="color: red;">*</span>
                 </label>
                 <select name="kelas" required style="width: 100%; padding: 10px 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; color: #495057; outline: none; background-color: #fff;">
                     <option value="" disabled {{ old('kelas', $siswa->kelas ?? '') == '' ? 'selected' : '' }}>-- Pilih Kelas --</option>
-                    @for ($i = 1; $i <= 6; $i++)
-                        {{-- Jika Anda ingin menyimpannya sebagai angka (1, 2, 3...) ganti $valKelas menjadi $i --}}
-                        @php $valKelas = 'Kelas ' . $i; @endphp
-                        <option value="{{ $valKelas }}" {{ old('kelas', $siswa->kelas ?? '') == $valKelas ? 'selected' : '' }}>
-                            {{ $valKelas }}
+                    @foreach ($kelas as $k)
+                        <option value="{{ $k->nama_kelas }}" {{ old('kelas', $siswa->kelas ?? '') == $k->nama_kelas ? 'selected' : '' }}>
+                            {{ $k->nama_kelas }}
                         </option>
-                    @endfor
+                    @endforeach
                 </select>
             </div>
 

@@ -24,12 +24,23 @@ class SiswaController extends Controller
      */
     public function addEdit($id = null)
     {
-        $siswa = $id ? Siswa::findOrFail($id) : new Siswa();
-        
-        // Mengambil seluruh data dari tabel kelas master untuk dropdown
-        $daftarKelas = Kelas::all();
+        // Jika ada ID (mode Edit), cari data siswa. Jika tidak (mode Tambah), set jadi null.
+        if ($id) {
+            try {
+                $resolvedId = Crypt::decrypt($id);
+            } catch (\Exception $e) {
+                $resolvedId = $id;
+            }
+            $siswa = Siswa::find($resolvedId);
+        } else {
+            $siswa = null; // <-- Ini penting agar tidak Undefined variable saat tambah data baru
+        }
 
-        return view('admin.siswa.form', compact('siswa', 'daftarKelas'));
+        // Mengambil semua data kelas terbaru dari database secara dinamis
+        $kelas = Kelas::all();
+
+        // Kirim variabel $siswa dan $kelas ke view form
+        return view('admin.siswa.form', compact('siswa', 'kelas'));
     }
 
     /**
